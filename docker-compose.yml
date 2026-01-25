@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  cms:
+    image: node:20.11.1-alpine
+    working_dir: /app
+    command: yarn start
+    volumes:
+      - .:/app
+    ports:
+      - 5000:3000

@@ -1,0 +1,26 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE: 588738580829.dkr.ecr.ap-southeast-2.amazonaws.com/mycomms-stage-cms:latest
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 588738580829.dkr.ecr.ap-southeast-2.amazonaws.com
+      - aws ssm get-parameter --with-decryption --output text --query 'Parameter.Value' --name /mycomms/stage/cms/env | base64 -d > .env
+      - docker pull $IMAGE || true
+
+  build:
+    commands:
+      - docker build --cache-from $IMAGE -t $IMAGE .
+
+  post_build:
+    commands:
+      - docker push $IMAGE
+      - mv cicd/stage/appspec.yml .
+
+artifacts:
+  files:
+    - 'cicd/**/*'
+    - appspec.yml

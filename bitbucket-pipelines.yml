@@ -1,0 +1,96 @@
+defintions:
+  steps:
+    - step: &base
+        runs-on: &runs-on
+          - 'self.hosted'
+          - 'linux'
+          - 'ebpearls'
+        script:
+          - pipe: atlassian/aws-code-deploy:0.2.10
+            variables: &aws-vars
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              COMMAND: 'upload'
+
+
+pipelines:
+  branches:
+    dev:
+      - step:
+          name: "(Dev) Cms"
+          runs-on: *runs-on
+          script:
+            - apt install -y zip
+            - mv cicd/dev/buildspec.yml .
+            - zip -r mycomms-dev-cms.zip .
+            - pipe: atlassian/aws-code-deploy:0.2.10
+              variables:
+                <<: *aws-vars
+                APPLICATION_NAME: 'mycomms-dev'
+                S3_BUCKET: 'mycomms-code-src/dev'
+                ZIP_FILE: 'mycomms-dev-cms.zip'
+                VERSION_LABEL: 'mycomms-dev-cms.zip'
+
+    stage:
+      - step:
+          name: "(Stage) Cms"
+          runs-on: *runs-on
+          script:
+            - apt install -y zip
+            - mv cicd/stage/buildspec.yml .
+            - zip -r mycomms-stage-cms.zip .
+            - pipe: atlassian/aws-code-deploy:0.2.10
+              variables:
+                <<: *aws-vars
+                APPLICATION_NAME: 'mycomms-stage'
+                S3_BUCKET: 'mycomms-code-src/stage'
+                ZIP_FILE: 'mycomms-stage-cms.zip'
+                VERSION_LABEL: 'mycomms-stage-cms.zip'
+
+    uat:
+      - step:
+          name: "(Uat) Cms"
+          runs-on: *runs-on
+          script:
+            - apt install -y zip
+            - mv cicd/uat/buildspec.yml .
+            - zip -r mycomms-uat-cms.zip .
+            - pipe: atlassian/aws-code-deploy:0.2.10
+              variables:
+                <<: *aws-vars
+                APPLICATION_NAME: 'mycomms-uat'
+                S3_BUCKET: 'mycomms-code-src/uat'
+                ZIP_FILE: 'mycomms-uat-cms.zip'
+                VERSION_LABEL: 'mycomms-uat-cms.zip'
+    prod:
+      - step:
+          name: "(Prod) Cms"
+          runs-on: *runs-on
+          script:
+            - apt install -y zip
+            - mv cicd/prod/buildspec.yml .
+            - zip -r mycomms-prod-cms.zip .
+            - pipe: atlassian/aws-code-deploy:0.2.10
+              variables:
+                <<: *aws-vars
+                APPLICATION_NAME: 'mycomms-prod'
+                S3_BUCKET: 'mycomms-code-src/prod'
+                ZIP_FILE: 'mycomms-prod-cms.zip'
+                VERSION_LABEL: 'mycomms-prod-cms.zip'
+
+    production:
+      - step:
+          name: "(Production) Cms"
+          runs-on: *runs-on
+          script:
+            - apt install -y zip
+            - mv cicd/production/buildspec.yml .
+            - zip -r mycomms-production-cms.zip .
+            - pipe: atlassian/aws-code-deploy:0.2.10
+              variables:
+                <<: *aws-vars
+                APPLICATION_NAME: 'commspec-prod'
+                S3_BUCKET: 'mycomms-code-src/production'
+                ZIP_FILE: 'mycomms-production-cms.zip'
+                VERSION_LABEL: 'mycomms-production-cms.zip'

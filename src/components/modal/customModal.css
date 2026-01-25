@@ -1,0 +1,14 @@
+/* cropper-custom.css */
+.cropper-crop-box,
+.cropper-view-box {
+  box-shadow: 0 0 0 1px #00aaff inset !important; /* thin border */
+}
+
+.cropper-crop-box {
+  border-radius: 4px;
+}
+
+.cropper-line,
+.cropper-point {
+  background-color: #00aaff !important; /* match border color */
+}

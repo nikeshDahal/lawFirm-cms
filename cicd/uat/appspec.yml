@@ -1,0 +1,7 @@
+version: 0.0
+os: linux
+hooks:
+  AfterInstall:
+    - location: cicd/uat/deploy
+      timeout: 1000
+      runas: mycomms

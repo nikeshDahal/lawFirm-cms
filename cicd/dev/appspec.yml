@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+hooks:
+  AfterInstall:
+    - location: cicd/dev/deploy
+      timeout: 1000
+      runas: mycomms
+  ValidateService:
+    - location: cicd/dev/trigger_lambda.sh
+      timeout: 300
+      runas: root

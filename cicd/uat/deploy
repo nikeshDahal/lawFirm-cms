@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+aws ecr get-login-password --region ap-southeast-2 |sudo docker login --username AWS --password-stdin 588738580829.dkr.ecr.ap-southeast-2.amazonaws.com
+
+cd /home/mycomms/uat
+
+sudo docker-compose pull cms_uat
+sudo docker-compose rm -s -f cms_uat
+sudo docker-compose up -d cms_uat
+
