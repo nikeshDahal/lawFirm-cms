@@ -26,10 +26,18 @@ export enum AdminRolesTypeEnum {
 }
 
 export enum PageTypeEnum {
-    ABOUT = 'ABOUT',
-    GENERIC = 'GENERIC',
-    CONTACT = 'CONTACT',
-    TERMS_AND_CONDITION = 'TERMS_AND_CONDITION',
-    PRIVACY_POLICY = 'PRIVACY_POLICY'
-    // other titles
+    HOME = 'Home',
+    RECOGNITION = 'Recognition',
+    ABOUT = 'About Us',
+    PRACTICE_AREAS = 'Practice Area',
+    PUBLICATIONS = 'Publication',
+    TEAMS = 'Teams',
+    PARTNERSHIPS = 'Partnership',
+    TESTIMONIALS = 'Testimonial',
+    CONTACT = 'Contact Us',
+    FAQ = 'FAQ',
+    GENERIC = 'Generic',
+    TERMS_AND_CONDITION = 'Terms And Conditions',
+    PRIVACY_POLICY = 'Privacy Policy',
+    BLOG = 'Blog'
 }

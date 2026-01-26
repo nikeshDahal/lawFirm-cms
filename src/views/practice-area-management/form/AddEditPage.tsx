@@ -1,13 +1,10 @@
-/* eslint no-nested-ternary: 0 */
-/* eslint no-underscore-dangle: 0 */
-
 import { useEffect, useRef, useState } from 'react';
 import slugify from 'slugify';
 import { Formik, FormikProps } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper } from '@mui/material';
+import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton } from '@mui/material';
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
 import { PageManagementListPath } from '../constants';
@@ -16,10 +13,15 @@ import { pageValidationSchema } from '../validations';
 import { useGQL } from '../hooks/useGQL';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import useSnackbar from '../hooks/useSnackbar';
-import QuillEditor from '../components/QuillEditor';
+// import QuillEditor from '../components/QuillEditor';
 import { PracticeAreaPath } from 'routes/PageManagementRoutes';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { uploadImage } from 'utils/imageUploader';
+import { useApolloClient } from '@apollo/client';
+import QuillEditor from 'utils/QuillEditor';
 
 const AddEditPagePracticeArea = () => {
+    const client = useApolloClient();
     const navigate = useNavigate();
     const { id } = useParams();
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -29,6 +31,8 @@ const AddEditPagePracticeArea = () => {
         slug: '',
         status: '',
         content: '',
+        metaData: '',
+        pageImage: '' as string | File,
         seoTags: {
             title: '',
             tags: '',
@@ -65,41 +69,50 @@ const AddEditPagePracticeArea = () => {
         handleCloseModal();
     };
 
-    const handleFormSubmit = async (values: any, setSubmitting: (isSubmitting: boolean) => void, setFieldValue) => {
-        if (id) {
-            try {
-                const { _id, slug, createdAt, updatedAt, ...others } = values;
+    const handleFormSubmit = async (values, setSubmitting) => {
+        try {
+            let payload = { ...values };
+
+            /** IMAGE UPLOAD */
+            if (values.pageImage instanceof File) {
+                const file = values.pageImage;
+                const { fileKey, publicUrl } = await uploadImage(client, file, {
+                    maxSizeMB: 3
+                });
+
+                payload.pageImage = publicUrl; // or fileKey depending on backend
+            }
+
+            /** CREATE vs UPDATE */
+            if (id) {
+                const { _id, slug, createdAt, updatedAt, pageType, author, ...others } = payload;
 
                 await handleUpdatePage({
                     variables: {
                         body: {
                             ...others,
-                            id: pageData?.page?._id!
+                            id: id!
                         }
                     }
                 });
-                navigate('/page-management/list', { state: { refetch: true } });
+
                 handleOpenSnackbar({ message: 'Page updated successfully', alertType: 'success' });
-                setSubmitting(false);
-            } catch (err: any) {
-                handleOpenSnackbar({ message: 'Page updated error', alertType: 'error' });
-                setSubmitting(false);
-            }
-        } else {
-            await handleCreatePage({
-                variables: {
-                    body: {
-                        ...values
+            } else {
+                const { pageType, ...formattedPayload } = payload;
+                await handleCreatePage({
+                    variables: {
+                        body: formattedPayload
                     }
-                }
-            })
-                .then((success: any) => {
-                    handleOpenSnackbar({ message: 'Page created successfully', alertType: 'success' });
-                    navigate('/page-management/list', { state: { refetch: true } });
-                })
-                .catch((err: any) => {
-                    handleOpenSnackbar({ message: err.message, alertType: 'error' });
                 });
+
+                handleOpenSnackbar({ message: 'Page created successfully', alertType: 'success' });
+            }
+
+            navigate(`${PracticeAreaPath}/list`, { state: { refetch: true } });
+        } catch (err: any) {
+            handleOpenSnackbar({ message: err.message, alertType: 'error' });
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -121,7 +134,7 @@ const AddEditPagePracticeArea = () => {
                 initialValues={initialValues}
                 validationSchema={pageValidationSchema}
                 onSubmit={(values, { setSubmitting, setFieldValue }) => {
-                    handleFormSubmit(values, setSubmitting, setFieldValue);
+                    handleFormSubmit(values, setSubmitting);
                 }}
             >
                 {({
@@ -136,20 +149,24 @@ const AddEditPagePracticeArea = () => {
                     isSubmitting
                     /* and other goodies */
                 }) => {
+                    {
+                        console.log('values.pageImage', values.pageImage);
+                    }
                     return (
                         <form onSubmit={handleSubmit}>
                             <MainCard title={id ? `Edit page template` : 'Add new page template'} sx={{ position: 'relative' }}>
                                 <Grid container spacing={2}>
                                     <Grid container item lg={6} spacing={2}>
-                                        <Grid item xs={12}>
+                                        {/* <Grid item xs={12}>
                                             <InputLabel>Pages type *</InputLabel>
                                             <TextField
                                                 id="page-type"
                                                 name="pageType"
                                                 select
-                                                value={values.pageType}
+                                                value={id ? values.pageType : PageTypeMapp[values?.pageType]}
                                                 fullWidth
                                                 onChange={handleChange}
+                                                disabled={id ? true : false}
                                             >
                                                 {PageTypes.map((option) => (
                                                     <MenuItem key={option.value} value={option.value}>
@@ -162,7 +179,7 @@ const AddEditPagePracticeArea = () => {
                                                     {errors.pageType}
                                                 </FormHelperText>
                                             )}
-                                        </Grid>
+                                        </Grid> */}
                                         <Grid item xs={12}>
                                             <InputLabel>Page title *</InputLabel>
                                             <TextField
@@ -198,6 +215,115 @@ const AddEditPagePracticeArea = () => {
                                             {touched.slug && errors.slug && (
                                                 <FormHelperText error id="slug-error">
                                                     {errors.slug}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <InputLabel>Meta data *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="metaData"
+                                                placeholder="Enter Meta Data"
+                                                value={values.metaData}
+                                                name="metaData"
+                                                onBlur={handleBlur}
+                                                onChange={(event) => {
+                                                    handleChange(event);
+                                                }}
+                                            />
+                                            {touched.metaData && errors.metaData && (
+                                                <FormHelperText error id="metaData-error">
+                                                    {errors.metaData}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <InputLabel>Page Image *</InputLabel>
+
+                                            {/* Image Upload Container */}
+                                            <div
+                                                onClick={() => document.getElementById('pageImageInput')?.click()}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '200px',
+                                                    border: '2px dashed #11382C',
+                                                    borderRadius: '8px',
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    cursor: 'pointer',
+                                                    position: 'relative',
+                                                    overflow: 'hidden',
+                                                    backgroundColor: '#f9f9f9'
+                                                }}
+                                            >
+                                                {/* Placeholder Text */}
+                                                {values.pageImage === '' && <span style={{ color: '#aaa' }}>Upload page image here</span>}
+
+                                                {/* Image Preview */}
+                                                {values.pageImage && (
+                                                    <div
+                                                        style={{
+                                                            position: 'relative',
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            padding: '10px',
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center'
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={
+                                                                values.pageImage instanceof File
+                                                                    ? URL.createObjectURL(values.pageImage)
+                                                                    : values.pageImage
+                                                            }
+                                                            alt="Preview"
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'contain',
+                                                                borderRadius: 4
+                                                            }}
+                                                        />
+
+                                                        <IconButton
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setFieldValue('pageImage', '');
+                                                            }}
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: 5,
+                                                                right: 5,
+                                                                backgroundColor: 'rgba(255,255,255,0.7)',
+                                                                color: 'red'
+                                                            }}
+                                                            size="small"
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    </div>
+                                                )}
+
+                                                {/* Hidden File Input */}
+                                                <input
+                                                    id="pageImageInput"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ display: 'none' }}
+                                                    onChange={(event) => {
+                                                        const file = event.target.files?.[0];
+                                                        if (!file) return;
+                                                        setFieldValue('pageImage', file); // now holds File instead of URL
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {touched.pageImage && errors.pageImage && (
+                                                <FormHelperText error id="pageImage-error">
+                                                    {errors.pageImage}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
