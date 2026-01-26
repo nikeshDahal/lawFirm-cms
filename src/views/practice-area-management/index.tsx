@@ -192,7 +192,7 @@ const PracticeArea = () => {
                                 placeholder="Search Page"
                                 size="small"
                             />
-                            <Button component={Link} to={PageManagementAddPath} variant="outlined" startIcon={<PlusIcon />}>
+                            <Button component={Link} to={`${PracticeAreaPath}/add`} variant="outlined" startIcon={<PlusIcon />}>
                                 Add new
                             </Button>
                         </Stack>

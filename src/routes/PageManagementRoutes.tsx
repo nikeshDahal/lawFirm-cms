@@ -65,6 +65,10 @@ const PageManagementNewRoutes = {
             element: <PracticeArea />
         },
         {
+            path: `${PracticeAreaPath}/add`,
+            element: <AddEditPagePracticeArea />
+        },
+        {
             path: `${PracticeAreaPath}/edit/:id`,
             element: <AddEditPagePracticeArea />
         }

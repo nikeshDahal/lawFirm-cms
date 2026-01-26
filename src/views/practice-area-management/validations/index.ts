@@ -5,13 +5,13 @@ const validateContent = (value) => {
     // Quill uses <p><br></p> to represent an empty editor, so we check for this
     const isEmptyContent = !value || value === '<p><br></p>';
     if (isEmptyContent) {
-      return false; // Fail validation
+        return false; // Fail validation
     }
     return true; // Pass validation
-  };
+};
 
 export const pageValidationSchema = Yup.object().shape({
-    pageType: Yup.string().required().trim().label('Page type'),
+    // pageType: Yup.string().required().trim().label('Page type'),
     title: Yup.string().min(3).max(30).required().trim().label('Title'),
     status: Yup.string().required().trim().label('Status'),
     slug: Yup.string().required().trim().label('Slug'),
