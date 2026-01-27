@@ -16,6 +16,47 @@ export const CREATE_PAGE_MUTATION = gql`
                 tags
             }
             pageType
+            author
+            contactInfo {
+                primaryEmail
+                secondaryEmail
+                primaryPhone
+                secondaryPhone
+            }
+            socialMedia {
+                facebook
+                instagram
+                linkedIn
+                youtube
+                tiktok
+                twitter
+            }
+            location {
+                label
+                address
+                city
+                country
+            }
+            officeHour {
+                day
+                note
+            }
+            recognitions {
+                title
+                subtitle
+                description
+            }
+            yearsOfExperience
+            subTitle
+            metaData {
+                secondaryTitle
+                secondarySubTitle
+                items {
+                    title
+                    description
+                }
+                description
+            }
         }
     }
 `;
@@ -36,6 +77,47 @@ export const UPDATE_PAGE_MUTATION = gql`
                 tags
             }
             pageType
+            author
+            contactInfo {
+                primaryEmail
+                secondaryEmail
+                primaryPhone
+                secondaryPhone
+            }
+            socialMedia {
+                facebook
+                instagram
+                linkedIn
+                youtube
+                tiktok
+                twitter
+            }
+            location {
+                label
+                address
+                city
+                country
+            }
+            officeHour {
+                day
+                note
+            }
+            recognitions {
+                title
+                subtitle
+                description
+            }
+            yearsOfExperience
+            subTitle
+            metaData {
+                secondaryTitle
+                secondarySubTitle
+                description
+                items {
+                    title
+                    description
+                }
+            }
         }
     }
 `;

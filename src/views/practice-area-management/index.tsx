@@ -131,7 +131,7 @@ const PracticeArea = () => {
     const handleRemovePage = async () => {
         try {
             await handleDeletePage({
-                variables: { removePageId: selectedPageId }
+                variables: { removePracticeAreaId: selectedPageId }
             });
             refetch();
             handleOpenSnackbar({ message: 'Page has been deleted successfully', alertType: 'success' });

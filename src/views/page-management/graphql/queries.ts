@@ -39,6 +39,46 @@ export const GET_ALL_PAGES = gql`
                 }
                 pageType
                 author
+                contactInfo {
+                    primaryEmail
+                    secondaryEmail
+                    primaryPhone
+                    secondaryPhone
+                }
+                socialMedia {
+                    facebook
+                    instagram
+                    linkedIn
+                    youtube
+                    tiktok
+                    twitter
+                }
+                location {
+                    label
+                    address
+                    city
+                    country
+                }
+                officeHour {
+                    day
+                    note
+                }
+                recognitions {
+                    title
+                    subtitle
+                    description
+                }
+                subTitle
+                yearsOfExperience
+                metaData {
+                    secondaryTitle
+                    secondarySubTitle
+                    description
+                    items {
+                        title
+                        description
+                    }
+                }
             }
         }
     }
@@ -60,6 +100,47 @@ export const GET_PAGE_DETAIL = gql`
                 tags
             }
             pageType
+            author
+            contactInfo {
+                primaryEmail
+                secondaryEmail
+                primaryPhone
+                secondaryPhone
+            }
+            socialMedia {
+                facebook
+                instagram
+                linkedIn
+                youtube
+                tiktok
+                twitter
+            }
+            location {
+                label
+                address
+                city
+                country
+            }
+            officeHour {
+                day
+                note
+            }
+            recognitions {
+                title
+                subtitle
+                description
+            }
+            subTitle
+            yearsOfExperience
+            metaData {
+                secondaryTitle
+                secondarySubTitle
+                description
+                items {
+                    title
+                    description
+                }
+            }
         }
     }
 `;

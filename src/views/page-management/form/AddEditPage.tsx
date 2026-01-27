@@ -3,20 +3,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import slugify from 'slugify';
-import { Formik, FormikProps } from 'formik';
+import { FieldArray, Formik, FormikProps } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper } from '@mui/material';
+import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, Divider, IconButton, Input } from '@mui/material';
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
 import { PageManagementListPath } from '../constants';
-import { PageStatus, PageTypeMapp, PageTypes } from '../constants/variables';
+import { PageStatus, PageTypes } from '../constants/variables';
 import { pageValidationSchema } from '../validations';
 import { useGQL } from '../hooks/useGQL';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import useSnackbar from '../hooks/useSnackbar';
 import QuillEditor from '../components/QuillEditor';
+import { PageTypeEnum } from '../constants/page-management-enum';
 
 const AddEditPage = () => {
     const navigate = useNavigate();
@@ -32,6 +33,23 @@ const AddEditPage = () => {
             title: '',
             tags: '',
             description: ''
+        },
+        recognitions: [
+            { title: '', subtitle: '', description: '' },
+            { title: '', subtitle: '', description: '' },
+            { title: '', subtitle: '', description: '' },
+            { title: '', subtitle: '', description: '' }
+        ],
+        yearsOfExperience: 0,
+        subTitle: '',
+        metaData: {
+            secondaryTitle: '',
+            secondarySubTitle: '',
+            description: '',
+            items: [
+                { title: '', description: '' },
+                { title: '', description: '' }
+            ]
         }
     });
 
@@ -67,7 +85,7 @@ const AddEditPage = () => {
     const handleFormSubmit = async (values: any, setSubmitting: (isSubmitting: boolean) => void, setFieldValue) => {
         if (id) {
             try {
-                const { _id, slug, createdAt, updatedAt, ...others } = values;
+                const { _id, slug, createdAt, updatedAt, author, ...others } = values;
 
                 await handleUpdatePage({
                     variables: {
@@ -81,7 +99,7 @@ const AddEditPage = () => {
                 handleOpenSnackbar({ message: 'Page updated successfully', alertType: 'success' });
                 setSubmitting(false);
             } catch (err: any) {
-                handleOpenSnackbar({ message: 'Page updated error', alertType: 'error' });
+                handleOpenSnackbar({ message: err.message, alertType: 'error' });
                 setSubmitting(false);
             }
         } else {
@@ -139,8 +157,14 @@ const AddEditPage = () => {
                         <form onSubmit={handleSubmit}>
                             <MainCard title={id ? `Edit page template` : 'Add new page template'} sx={{ position: 'relative' }}>
                                 <Grid container spacing={2}>
-                                    <Grid container item lg={6} spacing={2}>
-                                        <Grid item xs={12}>
+                                    {/* =================== Page Info Section =================== */}
+                                    <Grid item xs={12} mt={1}>
+                                        <strong>Page Information</strong>
+                                        <Divider sx={{ mb: 2, mt: 1 }} />
+                                    </Grid>
+
+                                    <Grid container item spacing={2}>
+                                        <Grid item xs={12} md={6}>
                                             <InputLabel>Pages type *</InputLabel>
                                             <TextField
                                                 id="page-type"
@@ -149,6 +173,7 @@ const AddEditPage = () => {
                                                 value={values.pageType}
                                                 fullWidth
                                                 onChange={handleChange}
+                                                disabled={id ? true : false}
                                             >
                                                 {PageTypes.map((option) => (
                                                     <MenuItem key={option.value} value={option.value}>
@@ -157,50 +182,11 @@ const AddEditPage = () => {
                                                 ))}
                                             </TextField>
                                             {touched.pageType && errors.pageType && (
-                                                <FormHelperText error id="pageType-error">
-                                                    {errors.pageType}
-                                                </FormHelperText>
+                                                <FormHelperText error>{errors.pageType}</FormHelperText>
                                             )}
                                         </Grid>
-                                        <Grid item xs={12}>
-                                            <InputLabel>Page title *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="title"
-                                                placeholder="Enter Title"
-                                                value={values.title}
-                                                name="title"
-                                                onBlur={handleBlur}
-                                                onChange={(event) => {
-                                                    handleChange(event);
-                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
-                                                }}
-                                            />
-                                            {touched.title && errors.title && (
-                                                <FormHelperText error id="title-error">
-                                                    {errors.title}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <InputLabel>Slug *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="slug"
-                                                placeholder="Enter slug"
-                                                value={values.slug}
-                                                name="slug"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                disabled={id ? true : false}
-                                            />
-                                            {touched.slug && errors.slug && (
-                                                <FormHelperText error id="slug-error">
-                                                    {errors.slug}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12}>
+
+                                        <Grid item xs={12} md={6}>
                                             <InputLabel>Status *</InputLabel>
                                             <TextField
                                                 id="page-status"
@@ -216,13 +202,296 @@ const AddEditPage = () => {
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
-                                            {touched.status && errors.status && (
-                                                <FormHelperText error id="status-error">
-                                                    {errors.status}
-                                                </FormHelperText>
+                                            {touched.status && errors.status && <FormHelperText error>{errors.status}</FormHelperText>}
+                                        </Grid>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Page title *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="title"
+                                                placeholder="Enter Title"
+                                                value={values.title}
+                                                name="title"
+                                                onBlur={handleBlur}
+                                                onChange={(event) => {
+                                                    handleChange(event);
+                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
+                                                }}
+                                            />
+                                            {touched.title && errors.title && <FormHelperText error>{errors.title}</FormHelperText>}
+                                        </Grid>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Page subtitle </InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="subTitle"
+                                                placeholder="Enter Subtitle"
+                                                value={values.subTitle}
+                                                name="subTitle"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched.subTitle && errors.subTitle && (
+                                                <FormHelperText error>{errors.subTitle}</FormHelperText>
                                             )}
                                         </Grid>
-                                        <Grid item xs={12}>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Years of experience </InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                type="number"
+                                                id="yearsOfExperience"
+                                                placeholder="Enter years of experience"
+                                                value={values.yearsOfExperience}
+                                                name="yearsOfExperience"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched.yearsOfExperience && errors.yearsOfExperience && (
+                                                <FormHelperText error>{errors.yearsOfExperience}</FormHelperText>
+                                            )}
+                                        </Grid>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Slug *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="slug"
+                                                placeholder="Enter slug"
+                                                value={values.slug}
+                                                name="slug"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                disabled={id ? true : false}
+                                            />
+                                            {touched.slug && errors.slug && <FormHelperText error>{errors.slug}</FormHelperText>}
+                                        </Grid>
+                                    </Grid>
+
+                                    {/** ================== Recognition Section =================== */}
+                                    {values.pageType === PageTypeEnum.RECOGNITION && (
+                                        <>
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Recognitions</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+
+                                            <Grid container item spacing={2}>
+                                                {values.recognitions?.map((recognition: any, index: number) => (
+                                                    <>
+                                                        <Grid item xs={12}>
+                                                            <InputLabel>Recognition {index + 1} </InputLabel>
+                                                        </Grid>
+                                                        <Grid item xs={12} md={6}>
+                                                            <InputLabel>Title *</InputLabel>
+                                                            <TextField
+                                                                fullWidth
+                                                                placeholder="Enter recognition title"
+                                                                name={`recognitions.${index}.title`}
+                                                                value={recognition.title}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(
+                                                                    touched.recognitions?.[index]?.title &&
+                                                                    typeof errors.recognitions?.[index] === 'object' &&
+                                                                    errors.recognitions?.[index]?.title
+                                                                )}
+                                                                helperText={
+                                                                    touched.recognitions?.[index]?.title &&
+                                                                    typeof errors.recognitions?.[index] === 'object'
+                                                                        ? errors.recognitions?.[index]?.title
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+
+                                                        <Grid item xs={12} md={6}>
+                                                            <InputLabel>Sub title *</InputLabel>
+                                                            <TextField
+                                                                fullWidth
+                                                                placeholder="Enter recognition subtitle"
+                                                                name={`recognitions.${index}.subtitle`}
+                                                                value={recognition.subtitle}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(
+                                                                    touched.recognitions?.[index]?.subtitle &&
+                                                                    typeof errors.recognitions?.[index] === 'object' &&
+                                                                    errors.recognitions?.[index]?.subtitle
+                                                                )}
+                                                                helperText={
+                                                                    touched.recognitions?.[index]?.subtitle &&
+                                                                    typeof errors.recognitions?.[index] === 'object'
+                                                                        ? errors.recognitions?.[index]?.subtitle
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+
+                                                        <Grid item xs={12} md={6}>
+                                                            <InputLabel>Recoginition description *</InputLabel>
+                                                            <TextField
+                                                                fullWidth
+                                                                placeholder="Enter recognition description"
+                                                                name={`recognitions.${index}.description`}
+                                                                value={recognition.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(
+                                                                    touched.recognitions?.[index]?.description &&
+                                                                    typeof errors.recognitions?.[index] === 'object' &&
+                                                                    errors.recognitions?.[index]?.description
+                                                                )}
+                                                                helperText={
+                                                                    touched.recognitions?.[index]?.description &&
+                                                                    typeof errors.recognitions?.[index] === 'object'
+                                                                        ? errors.recognitions?.[index]?.description
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                    </>
+                                                ))}
+                                            </Grid>
+                                        </>
+                                    )}
+
+                                    {/* =================== Meta Data Section =================== */}
+                                    {values.pageType === PageTypeEnum.ABOUT && (
+                                        <>
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Meta Data</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+
+                                            <Grid container item spacing={2}>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Secondary Title*</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="meta-secondary-title"
+                                                        placeholder="Secondary title"
+                                                        value={values.metaData?.secondaryTitle}
+                                                        name="metaData.secondaryTitle"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.metaData?.secondaryTitle && errors.metaData?.secondaryTitle && (
+                                                        <FormHelperText error>{errors.metaData?.secondaryTitle}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Secondary Sub Title*</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="meta-secondary-sub-title"
+                                                        placeholder="Secondary sub title"
+                                                        value={values.metaData?.secondarySubTitle}
+                                                        name="metaData.secondarySubTitle"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.metaData?.secondarySubTitle && errors.metaData?.secondarySubTitle && (
+                                                        <FormHelperText error>{errors.metaData?.secondarySubTitle}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12}>
+                                                    <InputLabel>Description*</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="meta-description"
+                                                        placeholder="Description"
+                                                        value={values.metaData?.description}
+                                                        name="metaData.description"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                        multiline
+                                                        rows={4}
+                                                    />
+                                                    {touched.metaData?.description && errors.metaData?.description && (
+                                                        <FormHelperText error>{errors.metaData?.description}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                {/* =================== Meta Data Items Section =================== */}
+                                                {values.metaData?.items.map((item, index) => (
+                                                    <>
+                                                        <Grid item xs={12} md={6}>
+                                                            <InputLabel>Item Title*</InputLabel>
+                                                            <TextField
+                                                                fullWidth
+                                                                id={`meta-data-item-${index}-title`}
+                                                                placeholder="Item title"
+                                                                value={item.title}
+                                                                name={`metaData.items.${index}.title`}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...values.metaData.items];
+                                                                    newItems[index].title = e.target.value;
+                                                                    setFieldValue('metaData.items', newItems);
+                                                                }}
+                                                                error={Boolean(
+                                                                    touched.metaData?.items?.[index]?.title &&
+                                                                    typeof errors.metaData?.items?.[index] === 'object' &&
+                                                                    errors.metaData?.items?.[index]?.title
+                                                                )}
+                                                                helperText={
+                                                                    touched.metaData?.items?.[index]?.title &&
+                                                                    typeof errors.metaData?.items?.[index] === 'object'
+                                                                        ? errors.metaData?.items?.[index]?.title
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+
+                                                        <Grid item xs={12} md={6}>
+                                                            <InputLabel>Item Description*</InputLabel>
+                                                            <TextField
+                                                                fullWidth
+                                                                id={`meta-data-item-${index}-description`}
+                                                                placeholder="Item description"
+                                                                value={item.description}
+                                                                name={`metaData.items.${index}.description`}
+                                                                onBlur={handleBlur}
+                                                                multiline
+                                                                rows={1}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...values.metaData.items];
+                                                                    newItems[index].description = e.target.value;
+                                                                    setFieldValue('metaData.items', newItems);
+                                                                }}
+                                                                error={Boolean(
+                                                                    touched.metaData?.items?.[index]?.description &&
+                                                                    typeof errors.metaData?.items?.[index] === 'object' &&
+                                                                    errors.metaData?.items?.[index]?.description
+                                                                )}
+                                                                helperText={
+                                                                    touched.metaData?.items?.[index]?.description &&
+                                                                    typeof errors.metaData?.items?.[index] === 'object'
+                                                                        ? errors.metaData?.items?.[index]?.description
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                    </>
+                                                ))}
+                                            </Grid>
+                                        </>
+                                    )}
+
+                                    {/* =================== SEO Section =================== */}
+                                    <Grid item xs={12} mt={3}>
+                                        <strong>SEO Settings</strong>
+                                        <Divider sx={{ mb: 2, mt: 1 }} />
+                                    </Grid>
+
+                                    <Grid container item spacing={2}>
+                                        <Grid item xs={12} md={6}>
                                             <InputLabel>Seo title</InputLabel>
                                             <TextField
                                                 fullWidth
@@ -234,12 +503,11 @@ const AddEditPage = () => {
                                                 onChange={handleChange}
                                             />
                                             {touched.seoTags?.title && errors.seoTags?.title && (
-                                                <FormHelperText error id="seo-title-error">
-                                                    {errors.seoTags?.title}
-                                                </FormHelperText>
+                                                <FormHelperText error>{errors.seoTags?.title}</FormHelperText>
                                             )}
                                         </Grid>
-                                        <Grid item xs={12}>
+
+                                        <Grid item xs={12} md={6}>
                                             <InputLabel>Seo tags</InputLabel>
                                             <TextField
                                                 fullWidth
@@ -251,13 +519,10 @@ const AddEditPage = () => {
                                                 onChange={handleChange}
                                             />
                                             {touched.seoTags?.tags && errors.seoTags?.tags && (
-                                                <FormHelperText error id="seo-tags-error">
-                                                    {errors.seoTags?.tags}
-                                                </FormHelperText>
+                                                <FormHelperText error>{errors.seoTags?.tags}</FormHelperText>
                                             )}
                                         </Grid>
-                                    </Grid>
-                                    <Grid container item xs={12} lg={10} spacing={2}>
+
                                         <Grid item xs={12}>
                                             <InputLabel>Seo description</InputLabel>
                                             <TextField
@@ -272,61 +537,62 @@ const AddEditPage = () => {
                                                 onChange={handleChange}
                                             />
                                             {touched.seoTags?.description && errors.seoTags?.description && (
-                                                <FormHelperText error id="seo-description-error">
-                                                    {errors.seoTags?.description}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <InputLabel>Content *</InputLabel>
-                                            <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
-                                            {touched.content && errors.content && (
-                                                <FormHelperText error id="pageType-error">
-                                                    {errors.content}
-                                                </FormHelperText>
+                                                <FormHelperText error>{errors.seoTags?.description}</FormHelperText>
                                             )}
                                         </Grid>
                                     </Grid>
+
+                                    {/* =================== Content Section =================== */}
+                                    <Grid item xs={12} mt={3}>
+                                        <strong>Page Content</strong>
+                                        <Divider sx={{ mb: 2, mt: 1 }} />
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <InputLabel>Content *</InputLabel>
+                                        <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
+                                        {touched.content && errors.content && <FormHelperText error>{errors.content}</FormHelperText>}
+                                    </Grid>
                                 </Grid>
                             </MainCard>
-                            <Grid item xs={12} mt={2}>
-                                <Paper sx={{ p: 2 }}>
-                                    <Stack className="button-wrapper-row">
-                                        {id ? (
-                                            <Button
-                                                disabled={isSubmitting}
-                                                onClick={async () => {
-                                                    const formErrors = await validateForm();
-                                                    if (!Object.keys(formErrors).length) {
-                                                        handleOpenModal();
-                                                    } else {
-                                                        handleSubmit();
-                                                    }
-                                                }}
-                                                variant="contained"
-                                                color="primary"
-                                                size="large"
-                                            >
-                                                Save changes
-                                            </Button>
-                                        ) : (
-                                            <Button type="submit" variant="contained" color="primary" size="large">
-                                                Save
-                                            </Button>
-                                        )}
+
+                            <Paper className="form-button-wrapper" sx={{ p: 2 }}>
+                                <Stack direction="row" justifyContent="flex-end" spacing={2}>
+                                    {id ? (
                                         <Button
-                                            onClick={() => {
-                                                navigate(PageManagementListPath);
+                                            disabled={isSubmitting}
+                                            onClick={async () => {
+                                                const formErrors = await validateForm();
+                                                if (!Object.keys(formErrors).length) {
+                                                    handleOpenModal();
+                                                } else {
+                                                    handleSubmit();
+                                                }
                                             }}
                                             variant="contained"
                                             color="primary"
                                             size="large"
                                         >
-                                            Cancel
+                                            Save changes
                                         </Button>
-                                    </Stack>
-                                </Paper>
-                            </Grid>
+                                    ) : (
+                                        <Button type="submit" variant="contained" color="primary" size="large">
+                                            Save
+                                        </Button>
+                                    )}
+
+                                    <Button
+                                        onClick={() => {
+                                            navigate(PageManagementListPath);
+                                        }}
+                                        variant="outlined"
+                                        color="primary"
+                                        size="large"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Stack>
+                            </Paper>
                         </form>
                     );
                 }}

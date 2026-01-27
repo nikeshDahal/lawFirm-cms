@@ -26,7 +26,7 @@ import CustomLoader from 'components/loader';
 import useTable from 'hooks/common/useTable';
 import { headCells } from './constants';
 import MainCard from 'ui-component/cards/MainCard';
-import { PageStatusMap, PaginationSortEnum } from './constants/page-management-enum';
+import { PageStatusMap, PageTypeMap, PaginationSortEnum } from './constants/page-management-enum';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { AdminRolesTypeEnum } from './constants/page-management-enum';
 import { ArrangementOrder, PageManagementCms } from './types';
@@ -210,10 +210,10 @@ const PageList = () => {
                                     <>
                                         {rows.map((row, index) => (
                                             <TableRow key={row._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                {/* table cells render data */}
                                                 <TableCell>{row.title}</TableCell>
+                                                <TableCell>{PageTypeMap[row.pageType]}</TableCell>
+                                                <TableCell>{row?.slug || '-'}</TableCell>
                                                 <TableCell>{row?.author || '-'}</TableCell>
-                                                {/* <TableCell>{row.createdBy}</TableCell> */}
                                                 <TableCell>{date.format(new Date(row.createdAt!), 'DD-MM-YYYY')}</TableCell>
                                                 <TableCell style={{ textTransform: 'capitalize' }}>{getChip(row.status)}</TableCell>
                                                 {/* table cells icon buttons */}

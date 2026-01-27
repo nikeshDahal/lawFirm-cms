@@ -71,6 +71,7 @@ const AddEditPagePracticeArea = () => {
 
     const handleFormSubmit = async (values, setSubmitting) => {
         try {
+            setSubmitting(true);
             let payload = { ...values };
 
             /** IMAGE UPLOAD */
@@ -86,7 +87,7 @@ const AddEditPagePracticeArea = () => {
             /** CREATE vs UPDATE */
             if (id) {
                 const { _id, slug, createdAt, updatedAt, pageType, author, ...others } = payload;
-
+                console.log('formattedPayload', others);
                 await handleUpdatePage({
                     variables: {
                         body: {
@@ -99,6 +100,7 @@ const AddEditPagePracticeArea = () => {
                 handleOpenSnackbar({ message: 'Page updated successfully', alertType: 'success' });
             } else {
                 const { pageType, ...formattedPayload } = payload;
+                console.log('formattedPayload', formattedPayload);
                 await handleCreatePage({
                     variables: {
                         body: formattedPayload
@@ -149,12 +151,9 @@ const AddEditPagePracticeArea = () => {
                     isSubmitting
                     /* and other goodies */
                 }) => {
-                    {
-                        console.log('values.pageImage', values.pageImage);
-                    }
                     return (
                         <form onSubmit={handleSubmit}>
-                            <MainCard title={id ? `Edit page template` : 'Add new page template'} sx={{ position: 'relative' }}>
+                            <MainCard title={id ? `Edit practice area` : 'Add new practice area'} sx={{ position: 'relative' }}>
                                 <Grid container spacing={2}>
                                     <Grid container item lg={6} spacing={2}>
                                         {/* <Grid item xs={12}>
@@ -210,7 +209,7 @@ const AddEditPagePracticeArea = () => {
                                                 name="slug"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                disabled={id ? true : false}
+                                                disabled={true}
                                             />
                                             {touched.slug && errors.slug && (
                                                 <FormHelperText error id="slug-error">
