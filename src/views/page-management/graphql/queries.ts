@@ -85,7 +85,7 @@ export const GET_ALL_PAGES = gql`
 `;
 
 export const GET_PAGE_DETAIL = gql`
-    query Page($pageId: String!) {
+    query Page($pageId: String) {
         page(id: $pageId) {
             _id
             createdAt

@@ -40,7 +40,7 @@ const AddEditPage = () => {
             { title: '', subtitle: '', description: '' },
             { title: '', subtitle: '', description: '' }
         ],
-        yearsOfExperience: 0,
+        yearsOfExperience: null,
         subTitle: '',
         metaData: {
             secondaryTitle: '',
@@ -222,38 +222,42 @@ const AddEditPage = () => {
                                             {touched.title && errors.title && <FormHelperText error>{errors.title}</FormHelperText>}
                                         </Grid>
 
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Page subtitle </InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="subTitle"
-                                                placeholder="Enter Subtitle"
-                                                value={values.subTitle}
-                                                name="subTitle"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.subTitle && errors.subTitle && (
-                                                <FormHelperText error>{errors.subTitle}</FormHelperText>
-                                            )}
-                                        </Grid>
+                                        {![PageTypeEnum.HOME, PageTypeEnum.RECOGNITION].includes(values.pageType as PageTypeEnum) && (
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Page subtitle</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="subTitle"
+                                                    placeholder="Enter Subtitle"
+                                                    value={values.subTitle}
+                                                    name="subTitle"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched.subTitle && errors.subTitle && (
+                                                    <FormHelperText error>{errors.subTitle}</FormHelperText>
+                                                )}
+                                            </Grid>
+                                        )}
 
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Years of experience </InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                type="number"
-                                                id="yearsOfExperience"
-                                                placeholder="Enter years of experience"
-                                                value={values.yearsOfExperience}
-                                                name="yearsOfExperience"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.yearsOfExperience && errors.yearsOfExperience && (
-                                                <FormHelperText error>{errors.yearsOfExperience}</FormHelperText>
-                                            )}
-                                        </Grid>
+                                        {values.pageType === PageTypeEnum.ABOUT && (
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Years of experience </InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    type="number"
+                                                    id="yearsOfExperience"
+                                                    placeholder="Enter years of experience"
+                                                    value={values.yearsOfExperience}
+                                                    name="yearsOfExperience"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched.yearsOfExperience && errors.yearsOfExperience && (
+                                                    <FormHelperText error>{errors.yearsOfExperience}</FormHelperText>
+                                                )}
+                                            </Grid>
+                                        )}
 
                                         <Grid item xs={12} md={6}>
                                             <InputLabel>Slug *</InputLabel>
@@ -421,6 +425,9 @@ const AddEditPage = () => {
                                                 {/* =================== Meta Data Items Section =================== */}
                                                 {values.metaData?.items.map((item, index) => (
                                                     <>
+                                                        <Grid item xs={12}>
+                                                            <InputLabel>Meta Data Item {index + 1} </InputLabel>
+                                                        </Grid>
                                                         <Grid item xs={12} md={6}>
                                                             <InputLabel>Item Title*</InputLabel>
                                                             <TextField
@@ -430,11 +437,7 @@ const AddEditPage = () => {
                                                                 value={item.title}
                                                                 name={`metaData.items.${index}.title`}
                                                                 onBlur={handleBlur}
-                                                                onChange={(e) => {
-                                                                    const newItems = [...values.metaData.items];
-                                                                    newItems[index].title = e.target.value;
-                                                                    setFieldValue('metaData.items', newItems);
-                                                                }}
+                                                                onChange={handleChange}
                                                                 error={Boolean(
                                                                     touched.metaData?.items?.[index]?.title &&
                                                                     typeof errors.metaData?.items?.[index] === 'object' &&
@@ -460,11 +463,7 @@ const AddEditPage = () => {
                                                                 onBlur={handleBlur}
                                                                 multiline
                                                                 rows={1}
-                                                                onChange={(e) => {
-                                                                    const newItems = [...values.metaData.items];
-                                                                    newItems[index].description = e.target.value;
-                                                                    setFieldValue('metaData.items', newItems);
-                                                                }}
+                                                                onChange={handleChange}
                                                                 error={Boolean(
                                                                     touched.metaData?.items?.[index]?.description &&
                                                                     typeof errors.metaData?.items?.[index] === 'object' &&
@@ -543,16 +542,24 @@ const AddEditPage = () => {
                                     </Grid>
 
                                     {/* =================== Content Section =================== */}
-                                    <Grid item xs={12} mt={3}>
-                                        <strong>Page Content</strong>
-                                        <Divider sx={{ mb: 2, mt: 1 }} />
-                                    </Grid>
 
-                                    <Grid item xs={12}>
-                                        <InputLabel>Content *</InputLabel>
-                                        <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
-                                        {touched.content && errors.content && <FormHelperText error>{errors.content}</FormHelperText>}
-                                    </Grid>
+                                    {[PageTypeEnum.HOME, PageTypeEnum.RECOGNITION, PageTypeEnum.ABOUT, PageTypeEnum.FAQ].includes(
+                                        values.pageType as PageTypeEnum
+                                    ) && (
+                                        <>
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Page Content</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <InputLabel>Content *</InputLabel>
+                                                <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
+                                                {touched.content && errors.content && (
+                                                    <FormHelperText error>{errors.content}</FormHelperText>
+                                                )}
+                                            </Grid>
+                                        </>
+                                    )}
                                 </Grid>
                             </MainCard>
 
