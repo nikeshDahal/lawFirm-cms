@@ -25,7 +25,16 @@ export const pageValidationSchema = Yup.object().shape({
     }),
 
     content: Yup.string().when('pageType', {
-        is: (val: PageTypeEnum) => [PageTypeEnum.HOME, PageTypeEnum.RECOGNITION, PageTypeEnum.ABOUT, PageTypeEnum.FAQ].includes(val),
+        is: (val: PageTypeEnum) =>
+            [
+                PageTypeEnum.HOME,
+                PageTypeEnum.RECOGNITION,
+                PageTypeEnum.ABOUT,
+                PageTypeEnum.FAQ,
+                PageTypeEnum.CONTACT,
+                PageTypeEnum.TERMS_AND_CONDITION,
+                PageTypeEnum.PRIVACY_POLICY
+            ].includes(val),
         then: (schema) =>
             schema
                 .test('content', 'Content description cannot be empty', (value) => validateContent(value))
@@ -72,6 +81,55 @@ export const pageValidationSchema = Yup.object().shape({
                         })
                     )
                     .min(2, 'At least two items are required')
+            }),
+        otherwise: (schema) => schema.optional().nullable()
+    }),
+
+    /** ================= CONTACT US ================== */
+    contactInfo: Yup.object().when('pageType', {
+        is: (val: string) => val === PageTypeEnum.CONTACT,
+        then: (schema) =>
+            schema.shape({
+                primaryEmail: Yup.string().email('Invalid email').required('Primary email is required'),
+                secondaryEmail: Yup.string().email('Invalid email').required('Secondary email is required'),
+                primaryPhone: Yup.string().required('Primary phone is required'),
+                secondaryPhone: Yup.string().required('Secondary phone is required')
+            }),
+        otherwise: (schema) => schema.optional().nullable()
+    }),
+
+    location: Yup.object().when('pageType', {
+        is: (val: string) => val === PageTypeEnum.CONTACT,
+        then: (schema) =>
+            schema.shape({
+                label: Yup.string().required('Label is required'),
+                address: Yup.string().required('Address is required'),
+                city: Yup.string().required('City is required'),
+                country: Yup.string().required('Country is required')
+            }),
+        otherwise: (schema) => schema.optional().nullable()
+    }),
+
+    officeHour: Yup.object().when('pageType', {
+        is: (val: string) => val === PageTypeEnum.CONTACT,
+        then: (schema) =>
+            schema.shape({
+                day: Yup.string().required('Day is required'),
+                note: Yup.string().required('Note is required')
+            }),
+        otherwise: (schema) => schema.optional().nullable()
+    }),
+
+    socialMedia: Yup.object().when('pageType', {
+        is: (val: string) => val === PageTypeEnum.CONTACT,
+        then: (schema) =>
+            schema.shape({
+                facebook: Yup.string().required('Facebook link is required'),
+                instagram: Yup.string().required('Instagram link is required'),
+                linkedIn: Yup.string().required('LinkedIn link is required'),
+                youtube: Yup.string().required('YouTube link is required'),
+                tiktok: Yup.string().required('TikTok link is required'),
+                twitter: Yup.string().required('Twitter link is required')
             }),
         otherwise: (schema) => schema.optional().nullable()
     })

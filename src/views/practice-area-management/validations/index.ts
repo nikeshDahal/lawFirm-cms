@@ -12,7 +12,7 @@ const validateContent = (value) => {
 
 export const pageValidationSchema = Yup.object().shape({
     // pageType: Yup.string().required().trim().label('Page type'),
-    title: Yup.string().min(3).max(30).required().trim().label('Title'),
+    title: Yup.string().min(3).max(100).required().trim().label('Title'),
     status: Yup.string().required().trim().label('Status'),
     slug: Yup.string().required().trim().label('Slug'),
     seoTags: Yup.object().shape({

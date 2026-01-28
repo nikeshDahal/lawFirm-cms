@@ -50,6 +50,30 @@ const AddEditPage = () => {
                 { title: '', description: '' },
                 { title: '', description: '' }
             ]
+        },
+        contactInfo: {
+            primaryEmail: '',
+            secondaryEmail: '',
+            primaryPhone: '',
+            secondaryPhone: ''
+        },
+        socialMedia: {
+            facebook: '',
+            instagram: '',
+            linkedIn: '',
+            youtube: '',
+            tiktok: '',
+            twitter: ''
+        },
+        location: {
+            label: '',
+            address: '',
+            city: '',
+            country: ''
+        },
+        officeHour: {
+            day: '',
+            note: ''
         }
     });
 
@@ -483,6 +507,291 @@ const AddEditPage = () => {
                                         </>
                                     )}
 
+                                    {/* =================== Contact Info Section =================== */}
+                                    {values.pageType === PageTypeEnum.CONTACT && (
+                                        <>
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Contact Information</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+
+                                            <Grid container item spacing={2}>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Primary Email</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-primary-email"
+                                                        placeholder="Primary email"
+                                                        value={values.contactInfo?.primaryEmail}
+                                                        name="contactInfo.primaryEmail"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.contactInfo?.primaryEmail && errors.contactInfo?.primaryEmail && (
+                                                        <FormHelperText error>{errors.contactInfo?.primaryEmail}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Secondary Email</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-secondary-email"
+                                                        placeholder="Secondary email"
+                                                        value={values.contactInfo?.secondaryEmail}
+                                                        name="contactInfo.secondaryEmail"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.contactInfo?.secondaryEmail && errors.contactInfo?.secondaryEmail && (
+                                                        <FormHelperText error>{errors.contactInfo?.secondaryEmail}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Primary Phone</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-primary-phone"
+                                                        placeholder="Primary phone"
+                                                        value={values.contactInfo?.primaryPhone}
+                                                        name="contactInfo.primaryPhone"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.contactInfo?.primaryPhone && errors.contactInfo?.primaryPhone && (
+                                                        <FormHelperText error>{errors.contactInfo?.primaryPhone}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Secondary Phone</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-secondary-phone"
+                                                        placeholder="Secondary phone"
+                                                        value={values.contactInfo?.secondaryPhone}
+                                                        name="contactInfo.secondaryPhone"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.contactInfo?.secondaryPhone && errors.contactInfo?.secondaryPhone && (
+                                                        <FormHelperText error>{errors.contactInfo?.secondaryPhone}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Social media accounts</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+                                            <Grid container item spacing={2}>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Facebook</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-facebook-url"
+                                                        placeholder="Facebook URL"
+                                                        value={values.socialMedia?.facebook}
+                                                        name="socialMedia.facebook"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.socialMedia?.facebook && errors.socialMedia?.facebook && (
+                                                        <FormHelperText error>{errors.socialMedia?.facebook}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Twitter</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-twitter-url"
+                                                        placeholder="Twitter URL"
+                                                        value={values.socialMedia?.twitter}
+                                                        name="socialMedia.twitter"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.socialMedia?.twitter && errors.socialMedia?.twitter && (
+                                                        <FormHelperText error>{errors.socialMedia?.twitter}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>LinkedIn</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-linkedin-url"
+                                                        placeholder="LinkedIn URL"
+                                                        value={values.socialMedia?.linkedIn}
+                                                        name="socialMedia.linkedIn"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.socialMedia?.linkedIn && errors.socialMedia?.linkedIn && (
+                                                        <FormHelperText error>{errors.socialMedia?.linkedIn}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Instagram</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-instagram-url"
+                                                        placeholder="Instagram URL"
+                                                        value={values.socialMedia?.instagram}
+                                                        name="socialMedia.instagram"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.socialMedia?.instagram && errors.socialMedia?.instagram && (
+                                                        <FormHelperText error>{errors.socialMedia?.instagram}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>YouTube</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-youtube-url"
+                                                        placeholder="YouTube URL"
+                                                        value={values.socialMedia?.youtube}
+                                                        name="socialMedia.youtube"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.socialMedia?.youtube && errors.socialMedia?.youtube && (
+                                                        <FormHelperText error>{errors.socialMedia?.youtube}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>TTikTok</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="contact-tiktok-url"
+                                                        placeholder="TikTok URL"
+                                                        value={values.socialMedia?.tiktok}
+                                                        name="socialMedia.tiktok"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.socialMedia?.tiktok && errors.socialMedia?.tiktok && (
+                                                        <FormHelperText error>{errors.socialMedia?.tiktok}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Office location</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+
+                                            <Grid container item spacing={2}>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Office type *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="office-location"
+                                                        placeholder="Enter office type eg : Head Office"
+                                                        value={values.location.label}
+                                                        name="location.label"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.location?.label && errors.location?.label && (
+                                                        <FormHelperText error>{errors.location?.label}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Office address *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="office-location"
+                                                        placeholder="Enter office location eg : Legal plaza , Kathmandu"
+                                                        value={values.location.address}
+                                                        name="location.address"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.location?.address && errors.location?.address && (
+                                                        <FormHelperText error>{errors.location?.address}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>City *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="office-city"
+                                                        placeholder="Enter office city eg : Kathmandu"
+                                                        value={values.location.city}
+                                                        name="location.city"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.location?.city && errors.location?.city && (
+                                                        <FormHelperText error>{errors.location?.city}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Country *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="office-country"
+                                                        placeholder="Enter office country eg : Nepal"
+                                                        value={values.location.country}
+                                                        name="location.country"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.location?.country && errors.location?.country && (
+                                                        <FormHelperText error>{errors.location?.country}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid item xs={12} mt={3}>
+                                                <strong>Office hours</strong>
+                                                <Divider sx={{ mb: 2, mt: 1 }} />
+                                            </Grid>
+
+                                            <Grid container item spacing={2}>
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Office working day and hours *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="office-working-hours"
+                                                        placeholder="Enter working hours eg : Mon-Fri 9:00 AM - 5:00 PM"
+                                                        value={values.officeHour.day}
+                                                        name="officeHour.day"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.officeHour?.day && errors.officeHour?.day && (
+                                                        <FormHelperText error>{errors.officeHour?.day}</FormHelperText>
+                                                    )}
+                                                </Grid>
+
+                                                <Grid item xs={12} md={6}>
+                                                    <InputLabel>Note *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="office-working-hours"
+                                                        placeholder="Enter note: e.g. Closed on public holidays"
+                                                        value={values.officeHour.note}
+                                                        name="officeHour.note"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.officeHour?.note && errors.officeHour?.note && (
+                                                        <FormHelperText error>{errors.officeHour?.note}</FormHelperText>
+                                                    )}
+                                                </Grid>
+                                            </Grid>
+                                        </>
+                                    )}
+
                                     {/* =================== SEO Section =================== */}
                                     <Grid item xs={12} mt={3}>
                                         <strong>SEO Settings</strong>
@@ -543,9 +852,15 @@ const AddEditPage = () => {
 
                                     {/* =================== Content Section =================== */}
 
-                                    {[PageTypeEnum.HOME, PageTypeEnum.RECOGNITION, PageTypeEnum.ABOUT, PageTypeEnum.FAQ].includes(
-                                        values.pageType as PageTypeEnum
-                                    ) && (
+                                    {[
+                                        PageTypeEnum.HOME,
+                                        PageTypeEnum.RECOGNITION,
+                                        PageTypeEnum.ABOUT,
+                                        PageTypeEnum.FAQ,
+                                        PageTypeEnum.CONTACT,
+                                        PageTypeEnum.TERMS_AND_CONDITION,
+                                        PageTypeEnum.PRIVACY_POLICY
+                                    ].includes(values.pageType as PageTypeEnum) && (
                                         <>
                                             <Grid item xs={12} mt={3}>
                                                 <strong>Page Content</strong>
