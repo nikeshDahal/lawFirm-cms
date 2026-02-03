@@ -4,40 +4,34 @@ import { Formik, FormikProps } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton, Divider } from '@mui/material';
+import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton, Divider, Rating } from '@mui/material';
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
 import { PageManagementListPath } from '../constants';
 import { PageStatus } from '../constants/variables';
-import { pageValidationSchema } from '../validations';
 import { useGQL } from '../hooks/useGQL';
 import useSnackbar from '../hooks/useSnackbar';
-import { PublicationPath } from 'routes/PageManagementRoutes';
+import { TestimonialPath } from 'routes/PageManagementRoutes';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { UPLOAD_IMAGE_MAX_SIZE_MB, uploadImage } from 'utils/imageUploader';
 import { useApolloClient } from '@apollo/client';
 import QuillEditor from 'utils/QuillEditor';
 import ConfirmationDialog from '../constants/components/ConfirmationDialog';
-import { PageTypeEnumCms } from '../constants/publicatoin-management-enum';
+import { PageStatusEnum } from '../constants/testimonials-management-enum';
+import { testimonialValidationSchema } from '../validations';
 
-const AddEditPublicationPage = () => {
+const AddEditTestimonialPage = () => {
     const client = useApolloClient();
     const navigate = useNavigate();
     const { id } = useParams();
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState({
-        pageType: '',
-        title: '',
-        slug: '',
-        status: '',
-        content: '',
-        metaData: '',
-        pageImage: '' as string | File,
-        seoTags: {
-            title: '',
-            tags: '',
-            description: ''
-        }
+        message: '',
+        rating: 0,
+        clientName: '',
+        clientDesignation: '',
+        clientImage: '' as string | File,
+        status: ''
     });
 
     const { handleOpenSnackbar } = useSnackbar();
@@ -49,14 +43,15 @@ const AddEditPublicationPage = () => {
     const { data: pageData, loading: pagaDataLoading } = GET_PAGE(id!);
     const [handleUpdatePage] = UPDATE_PAGE();
     const breadcrumbLinks = [
-        { title: 'Publication Management', to: `${PublicationPath}/list` },
-        { title: id ? `Edit ${pagaDataLoading ? '' : pageData?.findPublicationById?.page?.title}` : 'Add new publication' }
+        { title: 'Testimonial Management', to: `${TestimonialPath}/list` },
+        { title: id ? `Edit ${pagaDataLoading ? '' : pageData?.findTestimonialById?.page?.clientName}` : 'Add new testimonial' }
     ];
 
     useEffect(() => {
-        if (pageData?.findPublicationById?.page) {
+        if (pageData?.findTestimonialById?.page) {
             setInitialValues({
-                ...pageData?.findPublicationById?.page
+                ...pageData?.findTestimonialById?.page,
+                status: pageData?.findTestimonialById?.page.status?.toUpperCase() ?? 'INACTIVE'
             });
         }
     }, [pageData]);
@@ -74,42 +69,40 @@ const AddEditPublicationPage = () => {
             let payload = { ...values };
 
             /** IMAGE UPLOAD */
-            if (values.pageImage instanceof File) {
-                const file = values.pageImage;
+            if (values.clientImage instanceof File) {
+                const file = values.clientImage;
                 const { fileKey, publicUrl } = await uploadImage(client, file, {
                     maxSizeMB: UPLOAD_IMAGE_MAX_SIZE_MB
                 });
 
-                payload.pageImage = publicUrl; // or fileKey depending on backend
+                payload.clientImage = publicUrl; // or fileKey depending on backend
             }
 
             /** CREATE vs UPDATE */
             if (id) {
-                const { _id, slug, createdAt, updatedAt, author, ...others } = payload;
+                const { _id, createdAt, updatedAt, ...others } = payload;
                 await handleUpdatePage({
                     variables: {
                         body: {
                             ...others,
-                            pageType: PageTypeEnumCms.PUBLICATIONS,
                             id: id!
                         }
                     }
                 });
 
-                handleOpenSnackbar({ message: 'Page updated successfully', alertType: 'success' });
+                handleOpenSnackbar({ message: 'Testimonial updated successfully', alertType: 'success' });
             } else {
-                const { pageType, ...formattedPayload } = payload;
+                const { ...formattedPayload } = payload;
                 await handleCreatePage({
                     variables: {
-                        body: formattedPayload,
-                        pageType: PageTypeEnumCms.PUBLICATIONS
+                        body: formattedPayload
                     }
                 });
 
-                handleOpenSnackbar({ message: 'Page created successfully', alertType: 'success' });
+                handleOpenSnackbar({ message: 'Testimonial created successfully', alertType: 'success' });
             }
-            setSubmitting(false);
-            navigate(`${PublicationPath}/list`, { state: { refetch: true } });
+
+            navigate(`${TestimonialPath}/list`, { state: { refetch: true } });
         } catch (err: any) {
             handleOpenSnackbar({ message: err.message, alertType: 'error' });
         } finally {
@@ -133,7 +126,7 @@ const AddEditPublicationPage = () => {
                 innerRef={id ? formRef : null}
                 enableReinitialize
                 initialValues={initialValues}
-                validationSchema={pageValidationSchema}
+                validationSchema={testimonialValidationSchema}
                 onSubmit={(values, { setSubmitting, setFieldValue }) => {
                     handleFormSubmit(values, setSubmitting);
                 }}
@@ -153,68 +146,46 @@ const AddEditPublicationPage = () => {
                 }) => {
                     return (
                         <form onSubmit={handleSubmit}>
-                            <MainCard title={id ? `Edit publication` : 'Add new publication'} sx={{ position: 'relative' }}>
+                            <MainCard title={id ? `Edit testimonial` : 'Add new testimonial'} sx={{ position: 'relative' }}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} mt={1}>
-                                        <strong>Page Information</strong>
+                                        <strong>Client information</strong>
                                         <Divider sx={{ mb: 2, mt: 1 }} />
                                     </Grid>
                                     <Grid container item spacing={2}>
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Page title *</InputLabel>
+                                            <InputLabel>Client name *</InputLabel>
                                             <TextField
                                                 fullWidth
-                                                id="title"
-                                                placeholder="Enter Title"
-                                                value={values.title}
-                                                name="title"
+                                                id="clientName"
+                                                placeholder="Enter client name"
+                                                value={values.clientName}
+                                                name="clientName"
                                                 onBlur={handleBlur}
                                                 onChange={(event) => {
                                                     handleChange(event);
-                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
                                                 }}
                                             />
-                                            {touched.title && errors.title && (
-                                                <FormHelperText error id="title-error">
-                                                    {errors.title}
+                                            {touched.clientName && errors.clientName && (
+                                                <FormHelperText error id="clientName-error">
+                                                    {errors.clientName}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Slug *</InputLabel>
+                                            <InputLabel>Client designation *</InputLabel>
                                             <TextField
                                                 fullWidth
-                                                id="slug"
-                                                placeholder="Enter slug"
-                                                value={values.slug}
-                                                name="slug"
+                                                id="clientDesignation"
+                                                placeholder="Enter client designation"
+                                                value={values.clientDesignation}
+                                                name="clientDesignation"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                disabled={true}
                                             />
-                                            {touched.slug && errors.slug && (
-                                                <FormHelperText error id="slug-error">
-                                                    {errors.slug}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Meta data *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="metaData"
-                                                placeholder="Enter Meta Data"
-                                                value={values.metaData}
-                                                name="metaData"
-                                                onBlur={handleBlur}
-                                                onChange={(event) => {
-                                                    handleChange(event);
-                                                }}
-                                            />
-                                            {touched.metaData && errors.metaData && (
-                                                <FormHelperText error id="metaData-error">
-                                                    {errors.metaData}
+                                            {touched.clientDesignation && errors.clientDesignation && (
+                                                <FormHelperText error id="clientDesignation-error">
+                                                    {errors.clientDesignation}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
@@ -242,11 +213,28 @@ const AddEditPublicationPage = () => {
                                             )}
                                         </Grid>
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Page image *</InputLabel>
+                                            <InputLabel id="rating-label">Rating *</InputLabel>
+                                            <Rating
+                                                name="rating"
+                                                value={values.rating}
+                                                onChange={(event, newValue) => {
+                                                    setFieldValue('rating', newValue); // Formik setter
+                                                }}
+                                                onBlur={handleBlur}
+                                                precision={1} // whole stars only
+                                            />
+                                            {touched.rating && errors.rating && (
+                                                <FormHelperText error id="rating-error">
+                                                    {errors.rating}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Client image *</InputLabel>
 
                                             {/* Image Upload Container */}
                                             <div
-                                                onClick={() => document.getElementById('pageImageInput')?.click()}
+                                                onClick={() => document.getElementById('clientImageInput')?.click()}
                                                 style={{
                                                     width: '100%',
                                                     height: '300px',
@@ -262,10 +250,12 @@ const AddEditPublicationPage = () => {
                                                 }}
                                             >
                                                 {/* Placeholder Text */}
-                                                {values.pageImage === '' && <span style={{ color: '#aaa' }}>Upload page image here</span>}
+                                                {values.clientImage === '' && (
+                                                    <span style={{ color: '#aaa' }}>Upload client image here</span>
+                                                )}
 
                                                 {/* Image Preview */}
-                                                {values.pageImage && (
+                                                {values.clientImage && (
                                                     <div
                                                         style={{
                                                             position: 'relative',
@@ -279,9 +269,9 @@ const AddEditPublicationPage = () => {
                                                     >
                                                         <img
                                                             src={
-                                                                values.pageImage instanceof File
-                                                                    ? URL.createObjectURL(values.pageImage)
-                                                                    : values.pageImage
+                                                                values.clientImage instanceof File
+                                                                    ? URL.createObjectURL(values.clientImage)
+                                                                    : values.clientImage
                                                             }
                                                             alt="Preview"
                                                             style={{
@@ -295,7 +285,7 @@ const AddEditPublicationPage = () => {
                                                         <IconButton
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                setFieldValue('pageImage', '');
+                                                                setFieldValue('clientImage', '');
                                                             }}
                                                             style={{
                                                                 position: 'absolute',
@@ -313,84 +303,23 @@ const AddEditPublicationPage = () => {
 
                                                 {/* Hidden File Input */}
                                                 <input
-                                                    id="pageImageInput"
+                                                    id="clientImageInput"
                                                     type="file"
                                                     accept="image/*"
                                                     style={{ display: 'none' }}
                                                     onChange={(event) => {
                                                         const file = event.target.files?.[0];
                                                         if (!file) return;
-                                                        setFieldValue('pageImage', file);
-                                                        setFieldTouched('pageImage', false);
+                                                        setFieldValue('clientImage', file);
+                                                        setFieldTouched('clientImage', false);
                                                     }}
-                                                    onBlur={() => setFieldTouched('pageImage', true)}
+                                                    onBlur={() => setFieldTouched('clientImage', true)}
                                                 />
                                             </div>
 
-                                            {touched.pageImage && errors.pageImage && (
-                                                <FormHelperText error id="pageImage-error">
-                                                    {errors.pageImage}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                    </Grid>
-
-                                    {/* =================== SEO Section =================== */}
-                                    <Grid item xs={12} mt={3}>
-                                        <strong>SEO settings</strong>
-                                        <Divider sx={{ mb: 2, mt: 1 }} />
-                                    </Grid>
-                                    <Grid container item spacing={2}>
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Seo title</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="seo-title"
-                                                placeholder="Seo title"
-                                                value={values.seoTags?.title}
-                                                name="seoTags.title"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.seoTags?.title && errors.seoTags?.title && (
-                                                <FormHelperText error id="seo-title-error">
-                                                    {errors.seoTags?.title}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Seo tags</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="seo-tags"
-                                                placeholder="Tags"
-                                                value={values.seoTags?.tags}
-                                                name="seoTags.tags"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.seoTags?.tags && errors.seoTags?.tags && (
-                                                <FormHelperText error id="seo-tags-error">
-                                                    {errors.seoTags?.tags}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <InputLabel>Seo description</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="seo-description"
-                                                placeholder="Seo description"
-                                                value={values.seoTags?.description}
-                                                name="seoTags.description"
-                                                multiline
-                                                rows={4}
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.seoTags?.description && errors.seoTags?.description && (
-                                                <FormHelperText error id="seo-description-error">
-                                                    {errors.seoTags?.description}
+                                            {touched.clientImage && errors.clientImage && (
+                                                <FormHelperText error id="clientImage-error">
+                                                    {errors.clientImage}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
@@ -399,16 +328,16 @@ const AddEditPublicationPage = () => {
                                     {/* =================== Content Section =================== */}
                                     <Grid container item spacing={2}>
                                         <Grid item xs={12} mt={1}>
-                                            <strong>Page content</strong>
+                                            <strong>Client message</strong>
                                             <Divider sx={{ mb: 2, mt: 1 }} />
                                         </Grid>
 
                                         <Grid item xs={12}>
                                             <InputLabel>Content *</InputLabel>
-                                            <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
-                                            {touched.content && errors.content && (
-                                                <FormHelperText error id="pageType-error">
-                                                    {errors.content}
+                                            <QuillEditor value={values.message} setFieldValue={setFieldValue} fieldName="message" />
+                                            {touched.message && errors.message && (
+                                                <FormHelperText error id="message-error">
+                                                    {errors.message}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
@@ -472,4 +401,4 @@ const AddEditPublicationPage = () => {
     );
 };
 
-export default AddEditPublicationPage;
+export default AddEditTestimonialPage;

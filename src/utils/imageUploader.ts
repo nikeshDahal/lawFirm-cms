@@ -7,6 +7,8 @@ export type UploadResult = {
     fileKey: string;
 };
 
+export const UPLOAD_IMAGE_MAX_SIZE_MB = 3;
+
 export const uploadImage = async (client: ApolloClient<any>, file: File, options?: { maxSizeMB?: number }): Promise<UploadResult> => {
     const maxSizeMB = options?.maxSizeMB ?? 5;
     const fileSize = file.size / (1024 * 1024);

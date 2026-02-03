@@ -62,6 +62,11 @@ export const GET_PAGE_DETAIL = gql`
                 author
                 pageImage
                 metaData
+                seoTags {
+                    title
+                    description
+                    tags
+                }
             }
         }
     }
