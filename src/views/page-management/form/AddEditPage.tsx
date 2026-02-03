@@ -18,8 +18,12 @@ import ConfirmationDialog from '../components/ConfirmationDialog';
 import useSnackbar from '../hooks/useSnackbar';
 import QuillEditor from '../components/QuillEditor';
 import { PageTypeEnum } from '../constants/page-management-enum';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { uploadImage } from 'utils/imageUploader';
+import { useApolloClient } from '@apollo/client';
 
 const AddEditPage = () => {
+    const client = useApolloClient();
     const navigate = useNavigate();
     const { id } = useParams();
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -35,10 +39,10 @@ const AddEditPage = () => {
             description: ''
         },
         recognitions: [
-            { title: '', subtitle: '', description: '' },
-            { title: '', subtitle: '', description: '' },
-            { title: '', subtitle: '', description: '' },
-            { title: '', subtitle: '', description: '' }
+            { title: '', subtitle: '', description: '', icon: '' },
+            { title: '', subtitle: '', description: '', icon: '' },
+            { title: '', subtitle: '', description: '', icon: '' },
+            { title: '', subtitle: '', description: '', icon: '' }
         ],
         yearsOfExperience: null,
         subTitle: '',
@@ -107,9 +111,35 @@ const AddEditPage = () => {
     };
 
     const handleFormSubmit = async (values: any, setSubmitting: (isSubmitting: boolean) => void, setFieldValue) => {
+        console.log('Id==========t: ', id);
+
+        console.log('Form values submitted: ', values);
+
+        /** IMAGE UPLOAD */
+        const updatedRecognitions = await Promise.all(
+            values.recognitions.map(async (rec: any) => {
+                if (rec.icon instanceof File) {
+                    const { fileKey, publicUrl } = await uploadImage(client, rec.icon, {
+                        maxSizeMB: 3
+                    });
+
+                    return {
+                        ...rec,
+                        icon: publicUrl // or fileKey
+                    };
+                }
+
+                return rec;
+            })
+        );
+
+        const payload = {
+            ...values,
+            recognitions: updatedRecognitions
+        };
         if (id) {
             try {
-                const { _id, slug, createdAt, updatedAt, author, ...others } = values;
+                const { _id, slug, createdAt, updatedAt, author, ...others } = payload;
 
                 await handleUpdatePage({
                     variables: {
@@ -130,7 +160,7 @@ const AddEditPage = () => {
             await handleCreatePage({
                 variables: {
                     body: {
-                        ...values
+                        ...payload
                     }
                 }
             })
@@ -174,7 +204,9 @@ const AddEditPage = () => {
                     handleSubmit,
                     setFieldValue,
                     validateForm,
-                    isSubmitting
+                    isSubmitting,
+                    setFieldTouched
+
                     /* and other goodies */
                 }) => {
                     return (
@@ -380,6 +412,107 @@ const AddEditPage = () => {
                                                                         : ''
                                                                 }
                                                             />
+                                                        </Grid>
+                                                        <Grid item xs={12} md={6}>
+                                                            <InputLabel>Recognition Icon *</InputLabel>
+
+                                                            <div
+                                                                onClick={() => document.getElementById(`recognitionIcon-${index}`)?.click()}
+                                                                style={{
+                                                                    width: 90,
+                                                                    height: 90,
+                                                                    borderRadius: '50%',
+                                                                    border: `2px dashed ${
+                                                                        touched.recognitions?.[index]?.icon &&
+                                                                        typeof errors.recognitions?.[index] === 'object' &&
+                                                                        errors.recognitions?.[index]?.icon
+                                                                            ? '#d32f2f' // MUI error red
+                                                                            : '#11382C'
+                                                                    }`,
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    cursor: 'pointer',
+                                                                    position: 'relative',
+                                                                    backgroundColor: '#f9f9f9'
+                                                                }}
+                                                            >
+                                                                {/* Placeholder */}
+                                                                {!recognition.icon && (
+                                                                    <span
+                                                                        style={{
+                                                                            fontSize: 12,
+                                                                            color: '#aaa',
+                                                                            textAlign: 'center'
+                                                                        }}
+                                                                    >
+                                                                        Upload
+                                                                    </span>
+                                                                )}
+
+                                                                {/* Preview */}
+                                                                {recognition.icon && (
+                                                                    <>
+                                                                        <img
+                                                                            src={
+                                                                                recognition.icon instanceof File
+                                                                                    ? URL.createObjectURL(recognition.icon)
+                                                                                    : recognition.icon
+                                                                            }
+                                                                            alt="Recognition Icon"
+                                                                            style={{
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                objectFit: 'cover',
+                                                                                borderRadius: '50%'
+                                                                            }}
+                                                                        />
+
+                                                                        <IconButton
+                                                                            size="small"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setFieldValue(`recognitions.${index}.icon`, '');
+                                                                            }}
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: -8,
+                                                                                right: -8,
+                                                                                backgroundColor: '#fff',
+                                                                                boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                                                                                color: 'red'
+                                                                            }}
+                                                                        >
+                                                                            <DeleteIcon fontSize="small" />
+                                                                        </IconButton>
+                                                                    </>
+                                                                )}
+
+                                                                {/* Hidden input */}
+                                                                <input
+                                                                    id={`recognitionIcon-${index}`}
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    hidden
+                                                                    onChange={(e) => {
+                                                                        const file = e.currentTarget.files?.[0];
+                                                                        if (!file) return;
+
+                                                                        setFieldValue(`recognitions.${index}.icon`, file);
+                                                                        setFieldTouched(`recognitions.${index}.icon`, true);
+                                                                    }}
+                                                                    onBlur={() => setFieldTouched(`recognitions.${index}.icon`, true)}
+                                                                />
+                                                            </div>
+
+                                                            {/* Error text */}
+                                                            {touched.recognitions?.[index]?.icon &&
+                                                                typeof errors.recognitions?.[index] === 'object' &&
+                                                                errors.recognitions?.[index]?.icon && (
+                                                                    <FormHelperText error>
+                                                                        {errors.recognitions?.[index]?.icon}
+                                                                    </FormHelperText>
+                                                                )}
                                                         </Grid>
                                                     </>
                                                 ))}

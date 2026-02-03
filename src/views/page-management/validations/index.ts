@@ -51,7 +51,8 @@ export const pageValidationSchema = Yup.object().shape({
                 Yup.object().shape({
                     title: Yup.string().required('Title is required'),
                     subtitle: Yup.string().required('Subtitle is required'),
-                    description: Yup.string().required('Description is required')
+                    description: Yup.string().required('Description is required'),
+                    icon: Yup.string().required('Icon is required')
                 })
             ),
         otherwise: (schema) => schema.optional().nullable()

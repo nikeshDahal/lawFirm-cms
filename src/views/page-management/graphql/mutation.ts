@@ -45,6 +45,7 @@ export const CREATE_PAGE_MUTATION = gql`
                 title
                 subtitle
                 description
+                icon
             }
             yearsOfExperience
             subTitle
@@ -106,6 +107,7 @@ export const UPDATE_PAGE_MUTATION = gql`
                 title
                 subtitle
                 description
+                icon
             }
             yearsOfExperience
             subTitle

@@ -67,6 +67,7 @@ export const GET_ALL_PAGES = gql`
                     title
                     subtitle
                     description
+                    icon
                 }
                 subTitle
                 yearsOfExperience
@@ -129,6 +130,7 @@ export const GET_PAGE_DETAIL = gql`
                 title
                 subtitle
                 description
+                icon
             }
             subTitle
             yearsOfExperience
