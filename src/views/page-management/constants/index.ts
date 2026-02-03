@@ -16,6 +16,20 @@ export const headCells: HeadCell1[] = [
         sort: false
     },
     {
+        id: 'pageType',
+        numeric: false,
+        label: 'Page Type',
+        align: 'left',
+        sort: false
+    },
+    {
+        id: 'slug',
+        numeric: false,
+        label: 'Slug',
+        align: 'left',
+        sort: false
+    },
+    {
         id: 'author',
         numeric: false,
         label: 'Author',

@@ -26,10 +26,34 @@ export enum AdminRolesTypeEnum {
 }
 
 export enum PageTypeEnum {
+    HOME = 'HOME',
+    RECOGNITION = 'RECOGNITION',
     ABOUT = 'ABOUT',
-    GENERIC = 'GENERIC',
+    PRACTICE_AREAS = 'PRACTICE_AREAS',
+    PUBLICATIONS = 'PUBLICATIONS',
+    TEAMS = 'TEAMS',
+    PARTNERSHIPS = 'PARTNERSHIPS',
+    TESTIMONIALS = 'TESTIMONIALS',
     CONTACT = 'CONTACT',
+    FAQ = 'FAQ',
+    GENERIC = 'GENERIC',
     TERMS_AND_CONDITION = 'TERMS_AND_CONDITION',
-    PRIVACY_POLICY = 'PRIVACY_POLICY'
-    // other titles
+    PRIVACY_POLICY = 'PRIVACY_POLICY',
+    BLOG = 'BLOG'
 }
+export const PageTypeMap = {
+    HOME: 'Home',
+    RECOGNITION: 'Recognition',
+    ABOUT: 'About Us',
+    PRACTICE_AREAS: 'Practice Areas',
+    PUBLICATIONS: 'Publications',
+    TEAMS: 'Teams',
+    PARTNERSHIPS: 'Partnerships',
+    TESTIMONIALS: 'Testimonials',
+    CONTACT: 'Contact Us',
+    FAQ: 'FAQ',
+    GENERIC: 'Generic',
+    TERMS_AND_CONDITION: 'Terms And Conditions',
+    PRIVACY_POLICY: 'Privacy Policy',
+    BLOG: 'Blog'
+};
