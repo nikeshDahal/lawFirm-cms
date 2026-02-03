@@ -5,6 +5,8 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import AddEditPagePracticeArea from 'views/practice-area-management/form/AddEditPage';
+import Publication from 'views/publication-management';
+import AddEditPublicationPage from 'views/publication-management/form/AddEditPage';
 
 //solution to failed to fetch data dynamically
 const lazyReactNaiveRetry: typeof React.lazy = (importer) => {
@@ -31,6 +33,7 @@ const PageManagementListPath = '/page-management/list';
 const PageManagementAddPath = '/page-management/add';
 const PageManagementEditPath = '/page-management/edit';
 export const PracticeAreaPath = '/practice-area';
+export const PublicationPath = '/publication';
 
 /* Page management */
 const PageManagementList = Loadable(lazyReactNaiveRetry(() => import('views/page-management')));
@@ -71,6 +74,18 @@ const PageManagementNewRoutes = {
         {
             path: `${PracticeAreaPath}/edit/:id`,
             element: <AddEditPagePracticeArea />
+        },
+        {
+            path: `${PublicationPath}/list`,
+            element: <Publication />
+        },
+        {
+            path: `${PublicationPath}/add`,
+            element: <AddEditPublicationPage />
+        },
+        {
+            path: `${PublicationPath}/edit/:id`,
+            element: <AddEditPublicationPage />
         }
     ]
 };

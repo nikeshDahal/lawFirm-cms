@@ -13,7 +13,6 @@ import { useApolloClient } from '@apollo/client';
 import { SignedUrlMethod } from 'types/file-upload';
 import ImageResize from 'quill-image-resize-module-react';
 
-// Register Quill ImageUploader module
 Quill.register('modules/imageUploader', ImageUploader);
 Quill.register('modules/imageResize', ImageResize);
 

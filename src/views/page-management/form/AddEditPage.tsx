@@ -111,10 +111,6 @@ const AddEditPage = () => {
     };
 
     const handleFormSubmit = async (values: any, setSubmitting: (isSubmitting: boolean) => void, setFieldValue) => {
-        console.log('Id==========t: ', id);
-
-        console.log('Form values submitted: ', values);
-
         /** IMAGE UPLOAD */
         const updatedRecognitions = await Promise.all(
             values.recognitions.map(async (rec: any) => {
@@ -499,7 +495,7 @@ const AddEditPage = () => {
                                                                         if (!file) return;
 
                                                                         setFieldValue(`recognitions.${index}.icon`, file);
-                                                                        setFieldTouched(`recognitions.${index}.icon`, true);
+                                                                        setFieldTouched(`recognitions.${index}.icon`, false);
                                                                     }}
                                                                     onBlur={() => setFieldTouched(`recognitions.${index}.icon`, true)}
                                                                 />
