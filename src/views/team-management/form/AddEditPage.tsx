@@ -1,65 +1,65 @@
 import { useEffect, useRef, useState } from 'react';
-import slugify from 'slugify';
 import { Formik, FormikProps } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton, Divider } from '@mui/material';
+import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton } from '@mui/material';
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
-import { PageManagementListPath } from '../constants';
 import { PageStatus } from '../constants/variables';
-import { pageValidationSchema } from '../validations';
 import { useGQL } from '../hooks/useGQL';
 import useSnackbar from '../hooks/useSnackbar';
-import { PublicationPath } from 'routes/PageManagementRoutes';
+import { TeamPath } from 'routes/PageManagementRoutes';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { UPLOAD_IMAGE_MAX_SIZE_MB, uploadImage } from 'utils/imageUploader';
 import { useApolloClient } from '@apollo/client';
-import QuillEditor from 'utils/QuillEditor';
 import ConfirmationDialog from '../constants/components/ConfirmationDialog';
-import { PageTypeEnumCms } from '../constants/publicatoin-management-enum';
+import { teamValidationSchema } from '../validations';
 
-const AddEditPublicationPage = () => {
+const AddEditTeamPage = () => {
     const client = useApolloClient();
     const navigate = useNavigate();
     const { id } = useParams();
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState({
-        pageType: '',
-        title: '',
-        slug: '',
+        name: '',
+        designation: '',
+        practiceArea: '',
+        profileImage: '' as string | File | null,
         status: '',
-        content: '',
-        metaData: '',
-        pageImage: '' as string | File,
-        seoTags: {
-            title: '',
-            tags: '',
-            description: ''
-        }
+        facebook: '',
+        email: '',
+        linkedIn: '',
+        twitter: ''
     });
 
     const { handleOpenSnackbar } = useSnackbar();
 
     const formRef = useRef<FormikProps<typeof initialValues>>(null);
 
-    const { CREATE_PAGE, UPDATE_PAGE, GET_PAGE } = useGQL();
-    const [handleCreatePage, { data }] = CREATE_PAGE();
-    const { data: pageData, loading: pagaDataLoading } = GET_PAGE(id!);
-    const [handleUpdatePage] = UPDATE_PAGE();
+    const { CREATE_TEAM, UPDATE_TEAM, GET_TEAM } = useGQL();
+    const [handleCreateTeam, { data }] = CREATE_TEAM();
+    const { data: teamData, loading: teamDataLoading } = GET_TEAM(id!);
+    const [handleUpdateTeam] = UPDATE_TEAM();
     const breadcrumbLinks = [
-        { title: 'Publication Management', to: `${PublicationPath}/list` },
-        { title: id ? `Edit ${pagaDataLoading ? '' : pageData?.findPublicationById?.page?.title}` : 'Add new publication' }
+        { title: 'Team Management', to: `${TeamPath}/list` },
+        { title: id ? `Edit ${teamDataLoading ? '' : teamData?.findTeamById?.page?.name}` : 'Add new team member' }
     ];
 
     useEffect(() => {
-        if (pageData?.findPublicationById?.page) {
+        if (teamData?.findTeamById?.page) {
+            const page = teamData.findTeamById.page;
+
             setInitialValues({
-                ...pageData?.findPublicationById?.page
+                ...page,
+                status: page.status?.toUpperCase() ?? 'INACTIVE',
+                facebook: page.socialLinks?.facebook ?? '',
+                linkedIn: page.socialLinks?.linkedin ?? '',
+                twitter: page.socialLinks?.twitter ?? '',
+                email: page.socialLinks?.email ?? ''
             });
         }
-    }, [pageData]);
+    }, [teamData]);
 
     const handleSubmitExternally = () => {
         if (formRef.current) {
@@ -74,42 +74,40 @@ const AddEditPublicationPage = () => {
             let payload = { ...values };
 
             /** IMAGE UPLOAD */
-            if (values.pageImage instanceof File) {
-                const file = values.pageImage;
+            if (values.profileImage instanceof File) {
+                const file = values.profileImage;
                 const { fileKey, publicUrl } = await uploadImage(client, file, {
                     maxSizeMB: UPLOAD_IMAGE_MAX_SIZE_MB
                 });
 
-                payload.pageImage = publicUrl; // or fileKey depending on backend
+                payload.profileImage = publicUrl; // or fileKey depending on backend
             }
 
             /** CREATE vs UPDATE */
             if (id) {
-                const { _id, slug, createdAt, updatedAt, author, ...others } = payload;
-                await handleUpdatePage({
+                const { _id, createdAt, updatedAt, socialLinks, ...others } = payload;
+                await handleUpdateTeam({
                     variables: {
                         body: {
                             ...others,
-                            pageType: PageTypeEnumCms.PUBLICATIONS,
                             id: id!
                         }
                     }
                 });
 
-                handleOpenSnackbar({ message: 'Page updated successfully', alertType: 'success' });
+                handleOpenSnackbar({ message: 'Team member updated successfully', alertType: 'success' });
             } else {
-                const { pageType, ...formattedPayload } = payload;
-                await handleCreatePage({
+                const { ...formattedPayload } = payload;
+                await handleCreateTeam({
                     variables: {
-                        body: formattedPayload,
-                        pageType: PageTypeEnumCms.PUBLICATIONS
+                        body: formattedPayload
                     }
                 });
 
-                handleOpenSnackbar({ message: 'Page created successfully', alertType: 'success' });
+                handleOpenSnackbar({ message: 'Team member created successfully', alertType: 'success' });
             }
-            setSubmitting(false);
-            navigate(`${PublicationPath}/list`, { state: { refetch: true } });
+
+            navigate(`${TeamPath}/list`, { state: { refetch: true } });
         } catch (err: any) {
             handleOpenSnackbar({ message: err.message, alertType: 'error' });
         } finally {
@@ -133,7 +131,7 @@ const AddEditPublicationPage = () => {
                 innerRef={id ? formRef : null}
                 enableReinitialize
                 initialValues={initialValues}
-                validationSchema={pageValidationSchema}
+                validationSchema={teamValidationSchema}
                 onSubmit={(values, { setSubmitting, setFieldValue }) => {
                     handleFormSubmit(values, setSubmitting);
                 }}
@@ -153,68 +151,63 @@ const AddEditPublicationPage = () => {
                 }) => {
                     return (
                         <form onSubmit={handleSubmit}>
-                            <MainCard title={id ? `Edit publication` : 'Add new publication'} sx={{ position: 'relative' }}>
+                            <MainCard title={id ? `Edit team member` : 'Add new team member'} sx={{ position: 'relative' }}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} mt={1}>
-                                        <strong>Page Information</strong>
-                                        <Divider sx={{ mb: 2, mt: 1 }} />
+                                        <strong>Team Member Information</strong>
                                     </Grid>
                                     <Grid container item spacing={2}>
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Page title *</InputLabel>
+                                            <InputLabel>Name *</InputLabel>
                                             <TextField
                                                 fullWidth
-                                                id="title"
-                                                placeholder="Enter Title"
-                                                value={values.title}
-                                                name="title"
+                                                id="name"
+                                                placeholder="Enter name"
+                                                value={values.name}
+                                                name="name"
                                                 onBlur={handleBlur}
                                                 onChange={(event) => {
                                                     handleChange(event);
-                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
                                                 }}
                                             />
-                                            {touched.title && errors.title && (
-                                                <FormHelperText error id="title-error">
-                                                    {errors.title}
+                                            {touched.name && errors.name && (
+                                                <FormHelperText error id="name-error">
+                                                    {errors.name}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Slug *</InputLabel>
+                                            <InputLabel>Designation *</InputLabel>
                                             <TextField
                                                 fullWidth
-                                                id="slug"
-                                                placeholder="Enter slug"
-                                                value={values.slug}
-                                                name="slug"
+                                                id="designation"
+                                                placeholder="Enter designation"
+                                                value={values.designation}
+                                                name="designation"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                disabled={true}
                                             />
-                                            {touched.slug && errors.slug && (
-                                                <FormHelperText error id="slug-error">
-                                                    {errors.slug}
+                                            {touched.designation && errors.designation && (
+                                                <FormHelperText error id="designation-error">
+                                                    {errors.designation}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
 
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Meta data *</InputLabel>
+                                            <InputLabel>Practice Area *</InputLabel>
                                             <TextField
                                                 fullWidth
-                                                id="metaData"
-                                                placeholder="Enter Meta Data"
-                                                value={values.metaData}
-                                                name="metaData"
+                                                id="practiceArea"
+                                                placeholder="Enter practice area"
+                                                value={values.practiceArea}
+                                                name="practiceArea"
                                                 onBlur={handleBlur}
-                                                onChange={(event) => {
-                                                    handleChange(event);
-                                                }}
+                                                onChange={handleChange}
                                             />
-                                            {touched.metaData && errors.metaData && (
-                                                <FormHelperText error id="metaData-error">
-                                                    {errors.metaData}
+                                            {touched.practiceArea && errors.practiceArea && (
+                                                <FormHelperText error id="practiceArea-error">
+                                                    {errors.practiceArea}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
@@ -222,7 +215,7 @@ const AddEditPublicationPage = () => {
                                         <Grid item xs={12} md={6}>
                                             <InputLabel>Status *</InputLabel>
                                             <TextField
-                                                id="page-status"
+                                                id="team-status"
                                                 name="status"
                                                 select
                                                 value={values.status}
@@ -241,12 +234,13 @@ const AddEditPublicationPage = () => {
                                                 </FormHelperText>
                                             )}
                                         </Grid>
+
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Page image *</InputLabel>
+                                            <InputLabel>Profile Image *</InputLabel>
 
                                             {/* Image Upload Container */}
                                             <div
-                                                onClick={() => document.getElementById('pageImageInput')?.click()}
+                                                onClick={() => document.getElementById('profileImageInput')?.click()}
                                                 style={{
                                                     width: '100%',
                                                     height: '300px',
@@ -262,10 +256,12 @@ const AddEditPublicationPage = () => {
                                                 }}
                                             >
                                                 {/* Placeholder Text */}
-                                                {values.pageImage === '' && <span style={{ color: '#aaa' }}>Upload page image here</span>}
+                                                {(values.profileImage === '' || values.profileImage === null) && (
+                                                    <span style={{ color: '#aaa' }}>Upload profile image here</span>
+                                                )}
 
                                                 {/* Image Preview */}
-                                                {values.pageImage && (
+                                                {values.profileImage && (
                                                     <div
                                                         style={{
                                                             position: 'relative',
@@ -279,9 +275,9 @@ const AddEditPublicationPage = () => {
                                                     >
                                                         <img
                                                             src={
-                                                                values.pageImage instanceof File
-                                                                    ? URL.createObjectURL(values.pageImage)
-                                                                    : values.pageImage
+                                                                values.profileImage instanceof File
+                                                                    ? URL.createObjectURL(values.profileImage)
+                                                                    : values.profileImage
                                                             }
                                                             alt="Preview"
                                                             style={{
@@ -295,7 +291,7 @@ const AddEditPublicationPage = () => {
                                                         <IconButton
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                setFieldValue('pageImage', '');
+                                                                setFieldValue('profileImage', '');
                                                             }}
                                                             style={{
                                                                 position: 'absolute',
@@ -313,102 +309,102 @@ const AddEditPublicationPage = () => {
 
                                                 {/* Hidden File Input */}
                                                 <input
-                                                    id="pageImageInput"
+                                                    id="profileImageInput"
                                                     type="file"
                                                     accept="image/*"
                                                     style={{ display: 'none' }}
                                                     onChange={(event) => {
                                                         const file = event.target.files?.[0];
                                                         if (!file) return;
-                                                        setFieldValue('pageImage', file);
-                                                        setFieldTouched('pageImage', false);
+                                                        setFieldValue('profileImage', file);
+                                                        setFieldTouched('profileImage', false);
                                                     }}
-                                                    onBlur={() => setFieldTouched('pageImage', true)}
+                                                    onBlur={() => setFieldTouched('profileImage', true)}
                                                 />
                                             </div>
 
-                                            {touched.pageImage && errors.pageImage && (
-                                                <FormHelperText error id="pageImage-error">
-                                                    {errors.pageImage}
+                                            {touched.profileImage && errors.profileImage && (
+                                                <FormHelperText error id="profileImage-error">
+                                                    {errors.profileImage}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
                                     </Grid>
 
-                                    {/* =================== SEO Section =================== */}
-                                    <Grid item xs={12} mt={3}>
-                                        <strong>SEO settings</strong>
-                                        <Divider sx={{ mb: 2, mt: 1 }} />
-                                    </Grid>
-                                    <Grid container item spacing={2}>
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Seo title</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="seo-title"
-                                                placeholder="Seo title"
-                                                value={values.seoTags?.title}
-                                                name="seoTags.title"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.seoTags?.title && errors.seoTags?.title && (
-                                                <FormHelperText error id="seo-title-error">
-                                                    {errors.seoTags?.title}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Seo tags</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="seo-tags"
-                                                placeholder="Tags"
-                                                value={values.seoTags?.tags}
-                                                name="seoTags.tags"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.seoTags?.tags && errors.seoTags?.tags && (
-                                                <FormHelperText error id="seo-tags-error">
-                                                    {errors.seoTags?.tags}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <InputLabel>Seo description</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="seo-description"
-                                                placeholder="Seo description"
-                                                value={values.seoTags?.description}
-                                                name="seoTags.description"
-                                                multiline
-                                                rows={4}
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.seoTags?.description && errors.seoTags?.description && (
-                                                <FormHelperText error id="seo-description-error">
-                                                    {errors.seoTags?.description}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                    </Grid>
-
-                                    {/* =================== Content Section =================== */}
+                                    {/* =================== Social Links Section =================== */}
                                     <Grid container item spacing={2}>
                                         <Grid item xs={12} mt={1}>
-                                            <strong>Page content</strong>
-                                            <Divider sx={{ mb: 2, mt: 1 }} />
+                                            <strong>Social Links</strong>
                                         </Grid>
 
-                                        <Grid item xs={12}>
-                                            <InputLabel>Content *</InputLabel>
-                                            <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
-                                            {touched.content && errors.content && (
-                                                <FormHelperText error id="pageType-error">
-                                                    {errors.content}
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Facebook URL</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="facebook"
+                                                placeholder="https://facebook.com/username"
+                                                value={values.facebook}
+                                                name="facebook"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched?.facebook && errors?.facebook && (
+                                                <FormHelperText error id="facebook-error">
+                                                    {errors.facebook}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Email *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="email"
+                                                placeholder="email@example.com"
+                                                value={values.email}
+                                                name="email"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched?.email && errors?.email && (
+                                                <FormHelperText error id="email-error">
+                                                    {errors.email}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>LinkedIn URL</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="linkedIn"
+                                                placeholder="https://linkedin.com/in/username"
+                                                value={values.linkedIn}
+                                                name="linkedIn"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched?.linkedIn && errors?.linkedIn && (
+                                                <FormHelperText error id="linkedIn-error">
+                                                    {errors.linkedIn}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+
+                                        <Grid item xs={12} md={6}>
+                                            <InputLabel>Twitter URL</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="twitter"
+                                                placeholder="https://twitter.com/username"
+                                                value={values.twitter}
+                                                name="twitter"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched?.twitter && errors?.twitter && (
+                                                <FormHelperText error id="twitter-error">
+                                                    {errors.twitter}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
@@ -442,7 +438,7 @@ const AddEditPublicationPage = () => {
                                         )}
                                         <Button
                                             onClick={() => {
-                                                navigate(PageManagementListPath);
+                                                navigate(`${TeamPath}/list`);
                                             }}
                                             variant="contained"
                                             color="primary"
@@ -461,8 +457,8 @@ const AddEditPublicationPage = () => {
                 <ConfirmationDialog
                     open={openModal}
                     handleClose={handleCloseModal}
-                    title={'Update page details'}
-                    content={'Are you sure you want to update page details ?'}
+                    title={'Update team member details'}
+                    content={'Are you sure you want to update team member details ?'}
                     yes={handleSubmitExternally}
                     buttonLabelYes={'Yes'}
                     buttonLabelNo={'No'}
@@ -472,4 +468,4 @@ const AddEditPublicationPage = () => {
     );
 };
 
-export default AddEditPublicationPage;
+export default AddEditTeamPage;

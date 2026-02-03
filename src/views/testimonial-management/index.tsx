@@ -7,6 +7,7 @@ import {
     InputAdornment,
     Menu,
     MenuItem,
+    Rating,
     Stack,
     Table,
     TableBody,
@@ -26,12 +27,11 @@ import CustomLoader from 'components/loader';
 import useTable from 'hooks/common/useTable';
 import { headCells } from './constants';
 import MainCard from 'ui-component/cards/MainCard';
-import { PageStatusMap, PageTypeEnumCms, PaginationSortEnum } from './constants/publicatoin-management-enum';
+import { PageStatusMap, PaginationSortEnum } from './constants/testimonials-management-enum';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { AdminRolesTypeEnum } from './constants/publicatoin-management-enum';
-import { ArrangementOrder, PageManagementCms } from './types';
-import { PageStatusEnum } from './constants/publicatoin-management-enum';
-import { PageManagementEditPath, PageManagementAddPath } from './constants';
+import { AdminRolesTypeEnum } from './constants/testimonials-management-enum';
+import { ArrangementOrder, TestimonialCms } from './types';
+import { PageStatusEnum } from './constants/testimonials-management-enum';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useDebouncedSearch from './hooks/useDebounceSearch';
 import { useGQL } from './hooks/useGQL';
@@ -39,16 +39,16 @@ import { PlusIcon, SearchIcon } from 'components/icons';
 import useSnackbar from './hooks/useSnackbar';
 import Noitems from 'components/no-items';
 import CustomPagination from 'components/pagination/Pagination';
-import { DateTime } from 'luxon';
 import { RowPerPageOptions } from 'store/constant';
 import { useSelector } from 'store';
 import Error from 'views/pages/maintenance/Error';
-import { PracticeAreaPath, PublicationPath } from 'routes/PageManagementRoutes';
+import { TestimonialPath } from 'routes/PageManagementRoutes';
 import ConfirmationDialog from './constants/components/ConfirmationDialog';
+import stripHtml from 'utils/htmlParser';
 
 // ==============================|| CUSTOMER LIST ||============================== //
 
-const Publication = () => {
+const Testimonials = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { TableContainer, EnhancedTableHead } = useTable();
@@ -63,7 +63,7 @@ const Publication = () => {
     const [order, setOrder] = useState<ArrangementOrder>(PaginationSortEnum.DESC);
     const [orderBy, setOrderBy] = useState<string>('_id');
     const [search, setSearch] = useState<string>('');
-    const [rows, setRows] = useState<PageManagementCms[]>([]);
+    const [rows, setRows] = useState<TestimonialCms[]>([]);
     const [selectedPageId, setSelectedPageId] = useState(null);
     const { handleOpenSnackbar } = useSnackbar();
     const [page, setPage] = useState<number>(0);
@@ -84,11 +84,11 @@ const Publication = () => {
     }, [location.state]);
 
     useEffect(() => {
-        if (data?.findAllPublications?.data) {
-            setRows(data.findAllPublications.data);
-            setCount(data.findAllPublications.pagination.total);
+        if (data?.findAllTestimonials?.data) {
+            setRows(data.findAllTestimonials.data);
+            setCount(data.findAllTestimonials.pagination.total);
         }
-    }, [data?.findAllPublications?.data]);
+    }, [data?.findAllTestimonials?.data]);
 
     const handleRefetch = () => {
         refetch({
@@ -97,8 +97,7 @@ const Publication = () => {
                 limit: pageMeta?.limit,
                 skip: search.length > 0 ? 0 : pageMeta?.skip,
                 order,
-                orderBy,
-                pageType: PageTypeEnumCms.PUBLICATIONS
+                orderBy
             }
         });
     };
@@ -107,7 +106,7 @@ const Publication = () => {
         const skip = page > 0 ? limit * page : 0;
         setPageMeta({ limit, skip });
         refetch({
-            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy, pageType: PageTypeEnumCms.PUBLICATIONS }
+            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy }
         });
     }, [page]);
 
@@ -116,7 +115,7 @@ const Publication = () => {
         const skip = 0;
         setPageMeta({ limit, skip });
         refetch({
-            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy, pageType: PageTypeEnumCms.PUBLICATIONS }
+            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy }
         });
     }, [rowsPerPage]);
 
@@ -146,13 +145,13 @@ const Publication = () => {
     const handleRemovePage = async () => {
         try {
             await handleDeletePage({
-                variables: { removePublicationId: selectedPageId }
+                variables: { removeTestimonialId: selectedPageId }
             });
             refetch();
-            handleOpenSnackbar({ message: 'Page has been deleted successfully', alertType: 'success' });
+            handleOpenSnackbar({ message: 'Testimonial has been deleted successfully', alertType: 'success' });
             handleCloseModal();
         } catch (error) {
-            handleOpenSnackbar({ message: 'Error removing page', alertType: 'error' });
+            handleOpenSnackbar({ message: 'Error removing testimonial', alertType: 'error' });
             handleCloseModal();
         }
     };
@@ -191,7 +190,7 @@ const Publication = () => {
             title={
                 <Grid container justifyContent={{ md: 'space-between' }} alignItems={{ md: 'center' }} spacing={2}>
                     <Grid item xs={12} md={5}>
-                        <Typography variant="h2">Publication Management</Typography>
+                        <Typography variant="h2">Testimonial Management</Typography>
                     </Grid>
                     <Grid item xs={12} md={7}>
                         <Stack>
@@ -207,7 +206,7 @@ const Publication = () => {
                                 placeholder="Search Page"
                                 size="small"
                             />
-                            <Button component={Link} to={`${PublicationPath}/add`} variant="outlined" startIcon={<PlusIcon />}>
+                            <Button component={Link} to={`${TestimonialPath}/add`} variant="outlined" startIcon={<PlusIcon />}>
                                 Add new
                             </Button>
                         </Stack>
@@ -226,11 +225,14 @@ const Publication = () => {
                                     <>
                                         {rows.map((row, index) => (
                                             <TableRow key={row._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                <TableCell>{row.title}</TableCell>
-                                                <TableCell>{row?.slug}</TableCell>
-                                                <TableCell>{row?.author || '-'}</TableCell>
-                                                <TableCell>{date.format(new Date(row.createdAt!), 'DD-MM-YYYY')}</TableCell>
+                                                <TableCell>{row?.clientName}</TableCell>
+                                                <TableCell>{row?.clientDesignation}</TableCell>
+                                                <TableCell>
+                                                    {row?.rating ? <Rating name="read-only" value={row.rating} readOnly /> : '-'}
+                                                </TableCell>
+                                                <TableCell>{stripHtml(row?.message)}</TableCell>
                                                 <TableCell style={{ textTransform: 'capitalize' }}>{getChip(row.status)}</TableCell>
+                                                <TableCell>{date.format(new Date(row.createdAt!), 'DD-MM-YYYY')}</TableCell>
                                                 <TableCell align="right">
                                                     <PopupState variant="popover" popupId="action-menu">
                                                         {(popupState) => (
@@ -246,7 +248,7 @@ const Publication = () => {
                                                                     <MenuItem
                                                                         disabled={canEditOrDelete()}
                                                                         onClick={() => {
-                                                                            navigate(`${PublicationPath}/edit/${row._id}`);
+                                                                            navigate(`${TestimonialPath}/edit/${row._id}`);
                                                                         }}
                                                                     >
                                                                         Edit
@@ -293,8 +295,8 @@ const Publication = () => {
                 <ConfirmationDialog
                     open={openModal}
                     handleClose={handleCloseModal}
-                    title={'Delete page'}
-                    content={'Are you sure you want to delete page ?'}
+                    title={'Delete testimonial'}
+                    content={'Are you sure you want to delete testimonial ?'}
                     yes={handleRemovePage}
                     buttonLabelYes={'Yes'}
                     buttonLabelNo={'No'}
@@ -303,4 +305,4 @@ const Publication = () => {
         </MainCard>
     );
 };
-export default Publication;
+export default Testimonials;

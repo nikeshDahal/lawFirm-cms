@@ -34,11 +34,17 @@ const PageManagementAddPath = '/page-management/add';
 const PageManagementEditPath = '/page-management/edit';
 export const PracticeAreaPath = '/practice-area';
 export const PublicationPath = '/publication';
+export const TestimonialPath = '/testimonial';
+export const TeamPath = '/team';
 
 /* Page management */
 const PageManagementList = Loadable(lazyReactNaiveRetry(() => import('views/page-management')));
 const PageManagementAddEdit = Loadable(lazyReactNaiveRetry(() => import('views/page-management/form/AddEditPage')));
 const PracticeArea = Loadable(lazyReactNaiveRetry(() => import('views/practice-area-management')));
+const Testimonial = Loadable(lazyReactNaiveRetry(() => import('views/testimonial-management')));
+const AddEditTestimonialPage = Loadable(lazyReactNaiveRetry(() => import('views/testimonial-management/form/AddEditPage')));
+const Team = Loadable(lazyReactNaiveRetry(() => import('views/team-management')));
+const AddEditTeamPage = Loadable(lazyReactNaiveRetry(() => import('views/team-management/form/AddEditPage')));
 // const PageManagementEdit = Loadable(lazyReactNaiveRetry(() => import('views/page-management/form/EditPage')));
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -63,6 +69,7 @@ const PageManagementNewRoutes = {
             path: `${PageManagementEditPath}/:id`,
             element: <PageManagementAddEdit />
         },
+        /** Practice Area */
         {
             path: `${PracticeAreaPath}/list`,
             element: <PracticeArea />
@@ -75,6 +82,7 @@ const PageManagementNewRoutes = {
             path: `${PracticeAreaPath}/edit/:id`,
             element: <AddEditPagePracticeArea />
         },
+        /** Publication */
         {
             path: `${PublicationPath}/list`,
             element: <Publication />
@@ -86,6 +94,32 @@ const PageManagementNewRoutes = {
         {
             path: `${PublicationPath}/edit/:id`,
             element: <AddEditPublicationPage />
+        },
+        /** Testimonial */
+        {
+            path: `${TestimonialPath}/list`,
+            element: <Testimonial />
+        },
+        {
+            path: `${TestimonialPath}/add`,
+            element: <AddEditTestimonialPage />
+        },
+        {
+            path: `${TestimonialPath}/edit/:id`,
+            element: <AddEditTestimonialPage />
+        },
+        /** Team */
+        {
+            path: `${TeamPath}/list`,
+            element: <Team />
+        },
+        {
+            path: `${TeamPath}/add`,
+            element: <AddEditTeamPage />
+        },
+        {
+            path: `${TeamPath}/edit/:id`,
+            element: <AddEditTeamPage />
         }
     ]
 };

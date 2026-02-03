@@ -26,12 +26,11 @@ import CustomLoader from 'components/loader';
 import useTable from 'hooks/common/useTable';
 import { headCells } from './constants';
 import MainCard from 'ui-component/cards/MainCard';
-import { PageStatusMap, PageTypeEnumCms, PaginationSortEnum } from './constants/publicatoin-management-enum';
+import { PageStatusMap, PaginationSortEnum } from './constants/team-management-enum';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { AdminRolesTypeEnum } from './constants/publicatoin-management-enum';
-import { ArrangementOrder, PageManagementCms } from './types';
-import { PageStatusEnum } from './constants/publicatoin-management-enum';
-import { PageManagementEditPath, PageManagementAddPath } from './constants';
+import { AdminRolesTypeEnum } from './constants/team-management-enum';
+import { ArrangementOrder, TeamMember } from './types';
+import { PageStatusEnum } from './constants/team-management-enum';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useDebouncedSearch from './hooks/useDebounceSearch';
 import { useGQL } from './hooks/useGQL';
@@ -39,16 +38,15 @@ import { PlusIcon, SearchIcon } from 'components/icons';
 import useSnackbar from './hooks/useSnackbar';
 import Noitems from 'components/no-items';
 import CustomPagination from 'components/pagination/Pagination';
-import { DateTime } from 'luxon';
 import { RowPerPageOptions } from 'store/constant';
 import { useSelector } from 'store';
 import Error from 'views/pages/maintenance/Error';
-import { PracticeAreaPath, PublicationPath } from 'routes/PageManagementRoutes';
+import { TeamPath } from 'routes/PageManagementRoutes';
 import ConfirmationDialog from './constants/components/ConfirmationDialog';
 
-// ==============================|| CUSTOMER LIST ||============================== //
+// ==============================|| TEAM MANAGEMENT ||============================== //
 
-const Publication = () => {
+const TeamManagement = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { TableContainer, EnhancedTableHead } = useTable();
@@ -63,20 +61,20 @@ const Publication = () => {
     const [order, setOrder] = useState<ArrangementOrder>(PaginationSortEnum.DESC);
     const [orderBy, setOrderBy] = useState<string>('_id');
     const [search, setSearch] = useState<string>('');
-    const [rows, setRows] = useState<PageManagementCms[]>([]);
-    const [selectedPageId, setSelectedPageId] = useState(null);
+    const [rows, setRows] = useState<TeamMember[]>([]);
+    const [selectedTeamId, setSelectedTeamId] = useState(null);
     const { handleOpenSnackbar } = useSnackbar();
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
     const [count, setCount] = useState<number>(0);
     const [pageMeta, setPageMeta] = useState<{ limit: number; skip: number }>({ limit: 10, skip: 0 });
 
-    const { GET_ADMIN_PROFILE, GET_PAGES_LIST, REMOVE_PAGE } = useGQL();
+    const { GET_ADMIN_PROFILE, GET_TEAMS_LIST, REMOVE_TEAM } = useGQL();
     const { loading: adminProfileLoading, data: adminProfileData } = GET_ADMIN_PROFILE();
-    const { loading, data, refetch } = GET_PAGES_LIST();
-    const [handleDeletePage] = REMOVE_PAGE();
+    const { loading, data, refetch } = GET_TEAMS_LIST();
+    const [handleDeleteTeam] = REMOVE_TEAM();
 
-    // Refetch pages if redirected from add page
+    // Refetch teams if redirected from add page
     useEffect(() => {
         if (location.state?.refetch) {
             refetch();
@@ -84,11 +82,11 @@ const Publication = () => {
     }, [location.state]);
 
     useEffect(() => {
-        if (data?.findAllPublications?.data) {
-            setRows(data.findAllPublications.data);
-            setCount(data.findAllPublications.pagination.total);
+        if (data?.findAllTeams?.data) {
+            setRows(data.findAllTeams.data);
+            setCount(data.findAllTeams.pagination.total);
         }
-    }, [data?.findAllPublications?.data]);
+    }, [data?.findAllTeams?.data]);
 
     const handleRefetch = () => {
         refetch({
@@ -97,8 +95,7 @@ const Publication = () => {
                 limit: pageMeta?.limit,
                 skip: search.length > 0 ? 0 : pageMeta?.skip,
                 order,
-                orderBy,
-                pageType: PageTypeEnumCms.PUBLICATIONS
+                orderBy
             }
         });
     };
@@ -107,7 +104,7 @@ const Publication = () => {
         const skip = page > 0 ? limit * page : 0;
         setPageMeta({ limit, skip });
         refetch({
-            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy, pageType: PageTypeEnumCms.PUBLICATIONS }
+            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy }
         });
     }, [page]);
 
@@ -116,7 +113,7 @@ const Publication = () => {
         const skip = 0;
         setPageMeta({ limit, skip });
         refetch({
-            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy, pageType: PageTypeEnumCms.PUBLICATIONS }
+            input: { searchText: search, limit, skip: search.length > 0 ? 0 : skip, order, orderBy }
         });
     }, [rowsPerPage]);
 
@@ -143,22 +140,22 @@ const Publication = () => {
     const canEditOrDelete = () =>
         ![AdminRolesTypeEnum.SUPER_ADMIN, AdminRolesTypeEnum.ADMIN].includes(adminProfileData?.getUserProfile?.role);
 
-    const handleRemovePage = async () => {
+    const handleRemoveTeam = async () => {
         try {
-            await handleDeletePage({
-                variables: { removePublicationId: selectedPageId }
+            await handleDeleteTeam({
+                variables: { removeTeamId: selectedTeamId }
             });
             refetch();
-            handleOpenSnackbar({ message: 'Page has been deleted successfully', alertType: 'success' });
+            handleOpenSnackbar({ message: 'Team member has been deleted successfully', alertType: 'success' });
             handleCloseModal();
         } catch (error) {
-            handleOpenSnackbar({ message: 'Error removing page', alertType: 'error' });
+            handleOpenSnackbar({ message: 'Error removing team member', alertType: 'error' });
             handleCloseModal();
         }
     };
 
     const handleOpenModal = (id) => {
-        setSelectedPageId(id);
+        setSelectedTeamId(id);
         setOpenModal(true);
     };
 
@@ -191,7 +188,7 @@ const Publication = () => {
             title={
                 <Grid container justifyContent={{ md: 'space-between' }} alignItems={{ md: 'center' }} spacing={2}>
                     <Grid item xs={12} md={5}>
-                        <Typography variant="h2">Publication Management</Typography>
+                        <Typography variant="h2">Team Management</Typography>
                     </Grid>
                     <Grid item xs={12} md={7}>
                         <Stack>
@@ -204,10 +201,10 @@ const Publication = () => {
                                     )
                                 }}
                                 onChange={debouncedSearch}
-                                placeholder="Search Page"
+                                placeholder="Search Team Member"
                                 size="small"
                             />
-                            <Button component={Link} to={`${PublicationPath}/add`} variant="outlined" startIcon={<PlusIcon />}>
+                            <Button component={Link} to={`${TeamPath}/add`} variant="outlined" startIcon={<PlusIcon />}>
                                 Add new
                             </Button>
                         </Stack>
@@ -226,11 +223,11 @@ const Publication = () => {
                                     <>
                                         {rows.map((row, index) => (
                                             <TableRow key={row._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                <TableCell>{row.title}</TableCell>
-                                                <TableCell>{row?.slug}</TableCell>
-                                                <TableCell>{row?.author || '-'}</TableCell>
-                                                <TableCell>{date.format(new Date(row.createdAt!), 'DD-MM-YYYY')}</TableCell>
+                                                <TableCell>{row?.name}</TableCell>
+                                                <TableCell>{row?.designation}</TableCell>
+                                                <TableCell>{row?.practiceArea}</TableCell>
                                                 <TableCell style={{ textTransform: 'capitalize' }}>{getChip(row.status)}</TableCell>
+                                                <TableCell>{date.format(new Date(row.createdAt!), 'DD-MM-YYYY')}</TableCell>
                                                 <TableCell align="right">
                                                     <PopupState variant="popover" popupId="action-menu">
                                                         {(popupState) => (
@@ -246,7 +243,7 @@ const Publication = () => {
                                                                     <MenuItem
                                                                         disabled={canEditOrDelete()}
                                                                         onClick={() => {
-                                                                            navigate(`${PublicationPath}/edit/${row._id}`);
+                                                                            navigate(`${TeamPath}/edit/${row._id}`);
                                                                         }}
                                                                     >
                                                                         Edit
@@ -293,9 +290,9 @@ const Publication = () => {
                 <ConfirmationDialog
                     open={openModal}
                     handleClose={handleCloseModal}
-                    title={'Delete page'}
-                    content={'Are you sure you want to delete page ?'}
-                    yes={handleRemovePage}
+                    title={'Delete team member'}
+                    content={'Are you sure you want to delete team member ?'}
+                    yes={handleRemoveTeam}
                     buttonLabelYes={'Yes'}
                     buttonLabelNo={'No'}
                 />
@@ -303,4 +300,4 @@ const Publication = () => {
         </MainCard>
     );
 };
-export default Publication;
+export default TeamManagement;
