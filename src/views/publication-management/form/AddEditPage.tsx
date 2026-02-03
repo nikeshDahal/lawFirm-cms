@@ -8,19 +8,19 @@ import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconBu
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
 import { PageManagementListPath } from '../constants';
-import { PageStatus, PageTypeMapp, PageTypes } from '../constants/variables';
+import { PageStatus } from '../constants/variables';
 import { pageValidationSchema } from '../validations';
 import { useGQL } from '../hooks/useGQL';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import useSnackbar from '../hooks/useSnackbar';
-// import QuillEditor from '../components/QuillEditor';
-import { PracticeAreaPath } from 'routes/PageManagementRoutes';
+import { PracticeAreaPath, PublicationPath } from 'routes/PageManagementRoutes';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { uploadImage } from 'utils/imageUploader';
 import { useApolloClient } from '@apollo/client';
 import QuillEditor from 'utils/QuillEditor';
+import index from 'swr';
 
-const AddEditPagePracticeArea = () => {
+const AddEditPublicationPage = () => {
     const client = useApolloClient();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -50,14 +50,14 @@ const AddEditPagePracticeArea = () => {
     const [handleUpdatePage] = UPDATE_PAGE();
     console.log('pageData', pageData);
     const breadcrumbLinks = [
-        { title: 'Practice Area Management', to: `${PracticeAreaPath}/list` },
-        { title: id ? `Edit ${pagaDataLoading ? '' : pageData?.findPracticeAreaById?.page?.title}` : 'Add new practice area' }
+        { title: 'Publication Management', to: `${PublicationPath}/list` },
+        { title: id ? `Edit ${pagaDataLoading ? '' : pageData?.findPublicationById?.page?.title}` : 'Add new publication' }
     ];
 
     useEffect(() => {
-        if (pageData?.findPracticeAreaById?.page) {
+        if (pageData?.findPublicationById?.page) {
             setInitialValues({
-                ...pageData?.findPracticeAreaById?.page
+                ...pageData?.findPublicationById?.page
             });
         }
     }, [pageData]);
@@ -110,7 +110,7 @@ const AddEditPagePracticeArea = () => {
                 handleOpenSnackbar({ message: 'Page created successfully', alertType: 'success' });
             }
 
-            navigate(`${PracticeAreaPath}/list`, { state: { refetch: true } });
+            navigate(`${PublicationPath}/list`, { state: { refetch: true } });
         } catch (err: any) {
             handleOpenSnackbar({ message: err.message, alertType: 'error' });
         } finally {
@@ -148,12 +148,13 @@ const AddEditPagePracticeArea = () => {
                     handleSubmit,
                     setFieldValue,
                     validateForm,
-                    isSubmitting
+                    isSubmitting,
+                    setFieldTouched
                     /* and other goodies */
                 }) => {
                     return (
                         <form onSubmit={handleSubmit}>
-                            <MainCard title={id ? `Edit practice area` : 'Add new practice area'} sx={{ position: 'relative' }}>
+                            <MainCard title={id ? `Edit publication` : 'Add new publication'} sx={{ position: 'relative' }}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} mt={1}>
                                         <strong>Page Information</strong>
@@ -241,7 +242,7 @@ const AddEditPagePracticeArea = () => {
                                                 </FormHelperText>
                                             )}
                                         </Grid>
-                                        <Grid item xs={12} md={3}>
+                                        <Grid item xs={12} md={6}>
                                             <InputLabel>Page image *</InputLabel>
 
                                             {/* Image Upload Container */}
@@ -320,8 +321,10 @@ const AddEditPagePracticeArea = () => {
                                                     onChange={(event) => {
                                                         const file = event.target.files?.[0];
                                                         if (!file) return;
-                                                        setFieldValue('pageImage', file); // now holds File instead of URL
+                                                        setFieldValue('pageImage', file);
+                                                        setFieldTouched('pageImage', false);
                                                     }}
+                                                    onBlur={() => setFieldTouched('pageImage', true)}
                                                 />
                                             </div>
 
@@ -470,4 +473,4 @@ const AddEditPagePracticeArea = () => {
     );
 };
 
-export default AddEditPagePracticeArea;
+export default AddEditPublicationPage;
