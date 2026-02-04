@@ -2,7 +2,7 @@ import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material
 import CircularProgress from '@mui/material/CircularProgress';
 import ClearIcon from '@mui/icons-material/Clear';
 import { ModalBox, StickyFooter, StickyHeader } from './confirmModal.style';
-import { ConfirmModalProps } from '../types';
+import { ConfirmModalProps } from '../../types';
 
 const ConfirmModal1 = ({
     open,

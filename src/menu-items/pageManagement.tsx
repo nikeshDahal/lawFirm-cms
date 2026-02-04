@@ -62,7 +62,7 @@ const pageManagement: NavItemType = {
             title: 'FAQs',
             type: 'item',
             icon: PageIcon,
-            url: '/faq/list',
+            url: '/faq/manage',
             breadcrumbs: false,
             roles: ['SUPERADMIN', 'ADMIN']
         },
