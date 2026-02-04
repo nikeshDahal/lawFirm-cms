@@ -8,7 +8,7 @@ import Feedback from './feedbackManagement';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-    items: [dashboard, userManagement, pageManagement, Feedback, template]
+    items: [dashboard, userManagement, pageManagement, template]
 };
 
 export default menuItems;

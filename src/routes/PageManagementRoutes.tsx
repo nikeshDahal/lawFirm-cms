@@ -36,6 +36,7 @@ export const PracticeAreaPath = '/practice-area';
 export const PublicationPath = '/publication';
 export const TestimonialPath = '/testimonial';
 export const TeamPath = '/team';
+export const FaqPath = '/faq';
 
 /* Page management */
 const PageManagementList = Loadable(lazyReactNaiveRetry(() => import('views/page-management')));
@@ -45,6 +46,8 @@ const Testimonial = Loadable(lazyReactNaiveRetry(() => import('views/testimonial
 const AddEditTestimonialPage = Loadable(lazyReactNaiveRetry(() => import('views/testimonial-management/form/AddEditPage')));
 const Team = Loadable(lazyReactNaiveRetry(() => import('views/team-management')));
 const AddEditTeamPage = Loadable(lazyReactNaiveRetry(() => import('views/team-management/form/AddEditPage')));
+const Faq = Loadable(lazyReactNaiveRetry(() => import('views/faq-management/FaqManagement')));
+const AddEditFaqPage = Loadable(lazyReactNaiveRetry(() => import('views/faq-management/FaqForm')));
 // const PageManagementEdit = Loadable(lazyReactNaiveRetry(() => import('views/page-management/form/EditPage')));
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -120,6 +123,19 @@ const PageManagementNewRoutes = {
         {
             path: `${TeamPath}/edit/:id`,
             element: <AddEditTeamPage />
+        },
+        /** FAQ */
+        {
+            path: `${FaqPath}/manage`,
+            element: <Faq />
+        },
+        {
+            path: `${FaqPath}/add`,
+            element: <AddEditFaqPage />
+        },
+        {
+            path: `${FaqPath}/edit/:id`,
+            element: <AddEditFaqPage />
         }
     ]
 };
