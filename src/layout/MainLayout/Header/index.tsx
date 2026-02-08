@@ -82,9 +82,9 @@ const Header = () => {
             </Box> */}
 
             {/* notification */}
-            <Box sx={{ display: { xs: 'none', lg: 'block', mr: '1rem' } }}>
+            {/* <Box sx={{ display: { xs: 'none', lg: 'block', mr: '1rem' } }}>
                 <NotificationSection />
-            </Box>
+            </Box> */}
 
             {/* full sceen toggler */}
             <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
