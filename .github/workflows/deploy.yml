@@ -28,4 +28,5 @@ jobs:
             git clean -fd
             npm install --legacy-peer-deps
             npm run build
-            pm2 restart lawfirm-cms --update-env
+            pm2 restart lawfirm-cms || pm2 start serve --name lawfirm-cms -- -s dist -l 5174
+            pm2 save  
