@@ -128,7 +128,14 @@ const MockComponent = () => {
                                             name="title"
                                             onBlur={handleBlur}
                                             onChange={(event) => {
-                                                setFieldValue('slug', slugify(event.target.value).toLowerCase());
+                                                setFieldValue(
+                                                    'slug',
+                                                    slugify(event.target.value, {
+                                                        lower: true,
+                                                        strict: true,
+                                                        trim: true
+                                                    })
+                                                );
                                                 handleChange(event);
                                             }}
                                         />
