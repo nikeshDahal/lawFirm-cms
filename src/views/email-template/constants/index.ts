@@ -50,7 +50,14 @@ export const fields: CustomFields = [
                         label: 'Title',
                         placeholder: 'Title',
                         customHandleChange: (name, event, setFieldValue, handleChange) => {
-                            setFieldValue('main[0][header][0][slug]', slugify(event.target.value).toLowerCase());
+                            setFieldValue(
+                                'main[0][header][0][slug]',
+                                slugify(event.target.value, {
+                                    lower: true,
+                                    strict: true,
+                                    trim: true
+                                })
+                            );
                             handleChange(event);
                         }
                     },

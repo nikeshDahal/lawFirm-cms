@@ -1,0 +1,50 @@
+/* ===== TABLE BASE ===== */
+.ql-editor table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+.ql-editor th,
+.ql-editor td {
+  border: 1px solid #d0d5dd;
+  padding: 10px;
+  min-width: 80px;
+}
+
+.ql-editor th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+/* ===== TABLE SELECTION ===== */
+.ql-editor .qlbt-cell-selected {
+  background: rgba(0, 123, 255, 0.12);
+}
+
+/* ===== OPERATION MENU ===== */
+.qlbt-operation-menu {
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.qlbt-operation-menu button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* ===== RESIZE HANDLES ===== */
+.qlbt-col-resize {
+  background-color: #1976d2;
+}
+
+/* ===== DARK MODE SUPPORT (optional) ===== */
+body.dark .ql-editor table {
+  color: #fff;
+}
+
+body.dark .ql-editor th {
+  background-color: #1e1e1e;
+}

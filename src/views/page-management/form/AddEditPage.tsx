@@ -268,7 +268,16 @@ const AddEditPage = () => {
                                                 onBlur={handleBlur}
                                                 onChange={(event) => {
                                                     handleChange(event);
-                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
+                                                    !id
+                                                        ? setFieldValue(
+                                                              'slug',
+                                                              slugify(event.target.value, {
+                                                                  lower: true,
+                                                                  strict: true,
+                                                                  trim: true
+                                                              })
+                                                          )
+                                                        : null;
                                                 }}
                                             />
                                             {touched.title && errors.title && <FormHelperText error>{errors.title}</FormHelperText>}

@@ -8,17 +8,16 @@ import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconBu
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
 import { PageManagementListPath } from '../constants';
-import { PageStatus, PageTypeMapp, PageTypes } from '../constants/variables';
+import { PageStatus } from '../constants/variables';
 import { pageValidationSchema } from '../validations';
 import { useGQL } from '../hooks/useGQL';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import useSnackbar from '../hooks/useSnackbar';
-// import QuillEditor from '../components/QuillEditor';
 import { PracticeAreaPath } from 'routes/PageManagementRoutes';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { uploadImage } from 'utils/imageUploader';
 import { useApolloClient } from '@apollo/client';
-import QuillEditor from 'utils/QuillEditor';
+import TinyMCEEditor from 'utils/TinyMcEditor';
 
 const AddEditPagePracticeArea = () => {
     const client = useApolloClient();
@@ -171,7 +170,16 @@ const AddEditPagePracticeArea = () => {
                                                 onBlur={handleBlur}
                                                 onChange={(event) => {
                                                     handleChange(event);
-                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
+                                                    !id
+                                                        ? setFieldValue(
+                                                              'slug',
+                                                              slugify(event.target.value, {
+                                                                  lower: true,
+                                                                  strict: true,
+                                                                  trim: true
+                                                              })
+                                                          )
+                                                        : null;
                                                 }}
                                             />
                                             {touched.title && errors.title && (
@@ -403,7 +411,7 @@ const AddEditPagePracticeArea = () => {
 
                                         <Grid item xs={12}>
                                             <InputLabel>Content *</InputLabel>
-                                            <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
+                                            <TinyMCEEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
                                             {touched.content && errors.content && (
                                                 <FormHelperText error id="pageType-error">
                                                     {errors.content}

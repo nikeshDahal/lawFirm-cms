@@ -16,9 +16,9 @@ import { PublicationPath } from 'routes/PageManagementRoutes';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { UPLOAD_IMAGE_MAX_SIZE_MB, uploadImage } from 'utils/imageUploader';
 import { useApolloClient } from '@apollo/client';
-import QuillEditor from 'utils/QuillEditor';
 import ConfirmationDialog from '../constants/components/ConfirmationDialog';
 import { PageTypeEnumCms } from '../constants/publicatoin-management-enum';
+import TinyMCEEditor from 'utils/TinyMcEditor';
 
 const AddEditPublicationPage = () => {
     const client = useApolloClient();
@@ -171,7 +171,16 @@ const AddEditPublicationPage = () => {
                                                 onBlur={handleBlur}
                                                 onChange={(event) => {
                                                     handleChange(event);
-                                                    !id ? setFieldValue('slug', slugify(event.target.value).toLowerCase()) : null;
+                                                    !id
+                                                        ? setFieldValue(
+                                                              'slug',
+                                                              slugify(event.target.value, {
+                                                                  lower: true,
+                                                                  strict: true,
+                                                                  trim: true
+                                                              })
+                                                          )
+                                                        : null;
                                                 }}
                                             />
                                             {touched.title && errors.title && (
@@ -405,7 +414,7 @@ const AddEditPublicationPage = () => {
 
                                         <Grid item xs={12}>
                                             <InputLabel>Content *</InputLabel>
-                                            <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
+                                            <TinyMCEEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />
                                             {touched.content && errors.content && (
                                                 <FormHelperText error id="pageType-error">
                                                     {errors.content}
