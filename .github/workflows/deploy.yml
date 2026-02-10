@@ -21,7 +21,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ${{ secrets.SERVER_PATH }}
-            git pull origin dev
+            git fetch origin
+            git reset --hard origin/dev
+            git clean -fd
             npm install --legacy-peer-deps
             npm run build
             pm2 restart all
