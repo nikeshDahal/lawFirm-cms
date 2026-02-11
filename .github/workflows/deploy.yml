@@ -35,4 +35,4 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: "cms.toplegaladvisers.com/*"
-          target: "/var/www/html/cms.toplegaladvisers.com"
+          target: "/var/www/html/"
