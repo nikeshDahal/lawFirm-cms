@@ -9,6 +9,13 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      VITE_APP_VERSION: ${{ secrets.VITE_APP_VERSION }}
+      GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
+      VITE_APP_GRAPHQL_URL: ${{ secrets.VITE_APP_GRAPHQL_URL }}
+      VITE_APP_PERSIST_KEY: ${{ secrets.VITE_APP_PERSIST_KEY }}
+      VITE_APP_TINY_MCE: ${{ secrets.VITE_APP_TINY_MCE }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,7 +29,7 @@ jobs:
         run: npm install --force
 
       - name: Build project
-        run: npm run fbuild
+        run: npm run build
 
       - name: Rename dist folder
         run: mv ./dist ./cms.toplegaladvisers.com
@@ -35,4 +42,4 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: "cms.toplegaladvisers.com/*"
-          target: "/var/www/html/cms.toplegaladvisers.com"
+          target: "/var/www/html/"
