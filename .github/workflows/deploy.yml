@@ -22,7 +22,7 @@ jobs:
         run: npm install --force
 
       - name: Build project
-        run: npm run fbuild
+        run: npm run build
 
       - name: Rename dist folder
         run: mv ./dist ./cms.toplegaladvisers.com
