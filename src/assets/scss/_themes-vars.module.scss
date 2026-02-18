@@ -8,6 +8,22 @@ $primaryMain: #11382C;  // main brand color
 $primaryDark: #0B2A20;  // deep green (headers, strong emphasis)
 $primary800:  #061912;  // darkest green (footer, text on light bg)
 
+.text-gradient-gold {
+  background: linear-gradient(
+    135deg,
+    #CFB06A 0%,
+    #D9B44A 45%,
+    #F2D57E 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+
+
 
 
 // secondary
