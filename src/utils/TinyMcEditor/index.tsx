@@ -185,205 +185,47 @@ const TinyMCEEditor = ({ value, setFieldValue, fieldName }) => {
             value={value}
             onEditorChange={(content) => setFieldValue(fieldName, content)}
             init={{
-                height: 600,
-                menubar: true,
-                branding: false,
-
-                /*
-    ===============================
-    PLUGINS
-    ===============================
-    */
+                height: 500,
                 plugins: [
+                    'a11ychecker',
                     'advlist',
                     'autolink',
-                    'lists',
-                    'link',
-                    'image',
-                    'charmap',
-                    'preview',
-                    'anchor',
-                    'searchreplace',
-                    'visualblocks',
-                    'code',
+                    'autosave',
+                    'directionality', // optional — can remove if not needed anymore
                     'fullscreen',
-                    'insertdatetime',
-                    'media',
-                    'table',
                     'help',
-                    'wordcount',
-                    'paste',
-                    'autoresize',
-                    'quickbars'
+                    'image',
+                    'importcss',
+                    'insertdatetime',
+                    'link',
+                    'lists',
+                    'markdown',
+                    'nonbreaking',
+                    'quickbars',
+                    'searchreplace',
+                    'table',
+                    'visualblocks',
+                    'visualchars',
+                    'wordcount'
                 ],
-
-                /*
-    ===============================
-    TOOLBAR
-    ===============================
-    */
-                toolbar: `
-      undo redo |
-      styles formatselect fontfamily fontsize |
-      bold italic underline strikethrough |
-      alignleft aligncenter alignright alignjustify |
-      bullist numlist outdent indent |
-      link image media table |
-      removeformat |
-      code fullscreen preview help
-    `,
-
-                toolbar_mode: 'sliding',
-
-                /*
-    ===============================
-    STYLE FORMATS (Legal CMS)
-    ===============================
-    */
-                style_formats: [
-                    { title: 'Paragraph', block: 'p' },
-                    { title: 'Heading 1', block: 'h1' },
-                    { title: 'Heading 2', block: 'h2' },
-                    { title: 'Heading 3', block: 'h3' },
-                    { title: 'Heading 4', block: 'h4' },
-                    { title: 'Blockquote', block: 'blockquote' },
-                    { title: 'Code Block', block: 'pre' }
-                ],
-
-                fontsize_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 30pt 36pt 48pt',
-
-                /*
-===============================
-LIST BEHAVIOR FIX ⭐⭐⭐⭐
-===============================
-*/
-
-                lists_indent_on_tab: true,
-                indent_use_margin: true,
-                indentation: '2em',
-
-                advlist_bullet_styles: 'default,circle,disc,square',
-                advlist_number_styles: 'default,lower-alpha,lower-roman,upper-alpha,upper-roman',
-
-                /*
-    ===============================
-    IMAGE UPLOAD
-    ===============================
-    */
-                automatic_uploads: true,
+                toolbar:
+                    'undo redo | \
+      blocks fontfamily fontsize | \
+      bold italic underline strikethrough | \
+      align numlist bullist | \
+      link image | table | \
+      lineheight outdent indent | \
+      forecolor backcolor removeformat | \
+      fullscreen',
                 images_upload_handler: async (blobInfo) => {
                     const file = blobInfo.blob();
                     return await imageUploadHandler(file);
                 },
+
                 image_title: true,
                 image_advtab: true,
                 file_picker_types: 'image',
-
-                /*
-    ===============================
-    TABLE CONFIG
-    ===============================
-    */
-                table_default_attributes: {
-                    border: '1'
-                },
-                table_default_styles: {
-                    borderCollapse: 'collapse',
-                    width: '100%'
-                },
-
-                /*
-    ===============================
-    CLEAN PASTE CONFIG ⭐⭐⭐⭐
-    ===============================
-    */
-                paste_as_text: false,
-                paste_data_images: true,
-                paste_webkit_styles: 'none',
-                paste_remove_styles_if_webkit: true,
-                paste_merge_formats: true,
-                paste_convert_word_fake_lists: true,
-
-                paste_preprocess: (plugin, args) => {
-                    args.content = args.content
-                        .replace(/class="Mso[a-zA-Z0-9]+"/g, '')
-                        .replace(/<span[^>]*>\s*<\/span>/g, '')
-                        .replace(/style="[^"]*"/g, '')
-                        .replace(/<!--.*?-->/g, '')
-                        .replace(/<\/?o:[^>]*>/g, '');
-                },
-
-                /*
-    ===============================
-    VALID HTML STRUCTURE ⭐⭐⭐⭐
-    ===============================
-    */
-                valid_elements:
-                    'p,br,strong/b,em/i,u,strike,blockquote,' +
-                    'h1,h2,h3,h4,h5,h6,' +
-                    'ul,ol,li,' +
-                    'table,thead,tbody,tr,td,th,' +
-                    'a[href|target],img[src|alt|width|height],' +
-                    'span[style],div[align],hr',
-
-                extended_valid_elements: 'div[align],p[align],span[style]',
-
-                /*
-    ===============================
-    CLEAN OUTPUT
-    ===============================
-    */
-                cleanup: true,
-                verify_html: true,
-                convert_fonts_to_spans: true,
-                forced_root_block: 'p',
-
-                /*
-    ===============================
-    QUICK TOOLBAR
-    ===============================
-    */
-                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
-                quickbars_insert_toolbar: 'image table',
-
-                /*
-    ===============================
-    AUTOSAVE (optional)
-    ===============================
-    */
-                autosave_ask_before_unload: true,
-                autosave_interval: '30s',
-
-                /*
-    ===============================
-    EDITOR CONTENT LOOK
-    (visual only)
-    ===============================
-    */
-                content_style: `
-      body {
-        font-family: ${theme.typography.fontFamily};
-        font-size: 15px;
-        line-height: 1.7;
-        padding: 20px;
-      }
-
-      table {
-        border-collapse: collapse;
-        width: 100%;
-      }
-
-      td, th {
-        border: 1px solid #ddd;
-        padding: 8px;
-      }
-
-      blockquote {
-        border-left: 4px solid #C5A059;
-        padding-left: 12px;
-        color: #555;
-      }
-    `
+                menubar: 'file edit view insert format tools table help'
             }}
         />
     );
