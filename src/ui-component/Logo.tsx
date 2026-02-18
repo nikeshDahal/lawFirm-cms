@@ -10,11 +10,11 @@ import { useSelector } from 'react-redux';
  *
  */
 import logoDark from 'assets/images/logo-dark.svg';
-import logo from 'assets/images/logo.svg';
+import logo from 'assets/images/logo-only.png';
 
 // ==============================|| LOGO SVG ||============================== //
 
-const Logo = () => {
+const Logo = ({ height = '50', width = '80' }: { height?: string; width?: string }) => {
     const theme = useTheme();
     let settings = useSelector((state: any) => state.settings.settings);
     let logoUrl = logo;
@@ -26,7 +26,7 @@ const Logo = () => {
         }
     }
 
-    return <img src={logoUrl} alt="logo" width="150" height="45" />;
+    return <img src={logoUrl} alt="logo" width={width} height={height} />;
 };
 
 export default Logo;

@@ -36,9 +36,20 @@ const Login = () => {
                                     <Grid container spacing={3} justifyContent="center">
                                         <Grid item>
                                             <Stack component={Link} alignItems={'center'} to="#" mb={3}>
-                                                <Logo />
+                                                <Logo height="120" width="200" />
                                             </Stack>
-                                            <Stack spacing={1}>
+                                            <Stack sx={{ mt: -2 }} spacing={1}>
+                                                <Typography
+                                                    sx={{ color: 'red', fontSize: '18px' }}
+                                                    gutterBottom
+                                                    align="center"
+                                                    variant={downMD ? 'h2' : 'h1'}
+                                                    className="text-gradient-gold"
+                                                >
+                                                    Top Legal Advisers
+                                                </Typography>
+                                            </Stack>
+                                            <Stack sx={{ mt: 5 }} spacing={1}>
                                                 <Typography gutterBottom align="center" variant={downMD ? 'h2' : 'h1'}>
                                                     Sign in to your account
                                                 </Typography>

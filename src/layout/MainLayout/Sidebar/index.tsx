@@ -26,8 +26,9 @@ import { MenuOrientation, ThemeMode } from 'types/config';
 import { Avatar } from '@mui/material';
 import { IconMenu2 } from '@tabler/icons-react';
 
-import logoDark from 'assets/images/logo-dark.svg';
+import logoDark from 'assets/images/logo-only.png';
 import logoWhite from 'assets/images/icons/white-myComms.svg';
+import Logo from 'ui-component/Logo';
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
 const Sidebar = () => {
@@ -42,7 +43,8 @@ const Sidebar = () => {
     const logo = useMemo(
         () => (
             <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', padding: '15px 18px' }}>
-                <img style={{ width: 150, height: 45 }} src={logoDark}></img>
+                {/* <img style={{ width: 80, height: 50 }} src={logoDark}></img> */}
+                <Logo height="50" width="80" />
                 <Avatar
                     variant="rounded"
                     sx={{
