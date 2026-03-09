@@ -113,7 +113,7 @@ const AddEditPage = () => {
     const handleFormSubmit = async (values: any, setSubmitting: (isSubmitting: boolean) => void, setFieldValue) => {
         /** IMAGE UPLOAD */
         const updatedRecognitions = await Promise.all(
-            values.recognitions.map(async (rec: any) => {
+            values?.recognitions?.map(async (rec: any) => {
                 if (rec.icon instanceof File) {
                     const { fileKey, publicUrl } = await uploadImage(client, rec.icon, {
                         maxSizeMB: 3
@@ -136,6 +136,8 @@ const AddEditPage = () => {
         if (id) {
             try {
                 const { _id, slug, createdAt, updatedAt, author, ...others } = payload;
+
+                console.log('Payload for update:', { ...others, id: pageData?.page?._id! });
 
                 await handleUpdatePage({
                     variables: {
@@ -163,9 +165,11 @@ const AddEditPage = () => {
                 .then((success: any) => {
                     handleOpenSnackbar({ message: 'Page created successfully', alertType: 'success' });
                     navigate('/page-management/list', { state: { refetch: true } });
+                    setSubmitting(false);
                 })
                 .catch((err: any) => {
                     handleOpenSnackbar({ message: err.message, alertType: 'error' });
+                    setSubmitting(false);
                 });
         }
     };
@@ -201,7 +205,8 @@ const AddEditPage = () => {
                     setFieldValue,
                     validateForm,
                     isSubmitting,
-                    setFieldTouched
+                    setFieldTouched,
+                    setSubmitting
 
                     /* and other goodies */
                 }) => {
@@ -931,7 +936,7 @@ const AddEditPage = () => {
                                     )}
 
                                     {/* =================== SEO Section =================== */}
-                                    <Grid item xs={12} mt={3}>
+                                    {/**   <Grid item xs={12} mt={3}>
                                         <strong>SEO Settings</strong>
                                         <Divider sx={{ mb: 2, mt: 1 }} />
                                     </Grid>
@@ -986,7 +991,7 @@ const AddEditPage = () => {
                                                 <FormHelperText error>{errors.seoTags?.description}</FormHelperText>
                                             )}
                                         </Grid>
-                                    </Grid>
+                                    </Grid> */}
 
                                     {/* =================== Content Section =================== */}
 
@@ -1036,7 +1041,7 @@ const AddEditPage = () => {
                                             Save changes
                                         </Button>
                                     ) : (
-                                        <Button type="submit" variant="contained" color="primary" size="large">
+                                        <Button type="submit" disabled={isSubmitting} variant="contained" color="primary" size="large">
                                             Save
                                         </Button>
                                     )}

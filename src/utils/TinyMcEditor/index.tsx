@@ -187,7 +187,6 @@ const TinyMCEEditor = ({ value, setFieldValue, fieldName }) => {
             init={{
                 height: 500,
                 plugins: [
-                    'a11ychecker',
                     'advlist',
                     'autolink',
                     'autosave',
@@ -199,7 +198,6 @@ const TinyMCEEditor = ({ value, setFieldValue, fieldName }) => {
                     'insertdatetime',
                     'link',
                     'lists',
-                    'markdown',
                     'nonbreaking',
                     'quickbars',
                     'searchreplace',

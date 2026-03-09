@@ -19,9 +19,9 @@ export const pageValidationSchema = Yup.object().shape({
     slug: Yup.string().required().trim().label('Slug'),
 
     seoTags: Yup.object().shape({
-        title: Yup.string().max(300).optional().trim().label('Seo title'),
-        tags: Yup.string().max(300).optional().trim().label('Seo tags'),
-        description: Yup.string().max(500).optional().trim().label('Seo description')
+        title: Yup.string().max(500).optional().trim().label('Seo title'),
+        tags: Yup.string().max(500).optional().trim().label('Seo tags'),
+        description: Yup.string().max(600).optional().trim().label('Seo description')
     }),
 
     content: Yup.string().when('pageType', {
