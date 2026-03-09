@@ -85,7 +85,7 @@ const AddEditPagePracticeArea = () => {
 
             /** CREATE vs UPDATE */
             if (id) {
-                const { _id, slug, createdAt, updatedAt, pageType, author, ...others } = payload;
+                const { _id, createdAt, updatedAt, pageType, author, ...others } = payload;
                 console.log('formattedPayload', others);
                 await handleUpdatePage({
                     variables: {
@@ -99,7 +99,6 @@ const AddEditPagePracticeArea = () => {
                 handleOpenSnackbar({ message: 'Page updated successfully', alertType: 'success' });
             } else {
                 const { pageType, ...formattedPayload } = payload;
-                console.log('formattedPayload', formattedPayload);
                 await handleCreatePage({
                     variables: {
                         body: formattedPayload
@@ -198,7 +197,7 @@ const AddEditPagePracticeArea = () => {
                                                 name="slug"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                disabled={true}
+                                                disabled={false}
                                             />
                                             {touched.slug && errors.slug && (
                                                 <FormHelperText error id="slug-error">

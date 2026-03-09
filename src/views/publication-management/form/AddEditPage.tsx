@@ -4,7 +4,7 @@ import { Formik, FormikProps } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton, Divider } from '@mui/material';
+import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton, Divider, Alert } from '@mui/material';
 import InputLabel from 'ui-component/extended/Form/InputLabel';
 
 import { PageManagementListPath } from '../constants';
@@ -14,6 +14,7 @@ import { useGQL } from '../hooks/useGQL';
 import useSnackbar from '../hooks/useSnackbar';
 import { PublicationPath } from 'routes/PageManagementRoutes';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import { UPLOAD_IMAGE_MAX_SIZE_MB, uploadImage } from 'utils/imageUploader';
 import { useApolloClient } from '@apollo/client';
 import ConfirmationDialog from '../constants/components/ConfirmationDialog';
@@ -85,7 +86,7 @@ const AddEditPublicationPage = () => {
 
             /** CREATE vs UPDATE */
             if (id) {
-                const { _id, slug, createdAt, updatedAt, author, ...others } = payload;
+                const { _id, createdAt, updatedAt, author, ...others } = payload;
                 await handleUpdatePage({
                     variables: {
                         body: {
@@ -199,7 +200,7 @@ const AddEditPublicationPage = () => {
                                                 name="slug"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                disabled={true}
+                                                disabled={false}
                                             />
                                             {touched.slug && errors.slug && (
                                                 <FormHelperText error id="slug-error">
@@ -335,6 +336,13 @@ const AddEditPublicationPage = () => {
                                                     onBlur={() => setFieldTouched('pageImage', true)}
                                                 />
                                             </div>
+                                            <Alert
+                                                severity="info"
+                                                icon={<InfoOutlined />}
+                                                sx={{ mt: 1, bgcolor: 'transparent', border: 'none', boxShadow: 'none' }}
+                                            >
+                                                Please upload image no larger than {UPLOAD_IMAGE_MAX_SIZE_MB} MB
+                                            </Alert>
 
                                             {touched.pageImage && errors.pageImage && (
                                                 <FormHelperText error id="pageImage-error">
