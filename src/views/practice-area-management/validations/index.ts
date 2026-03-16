@@ -12,13 +12,13 @@ const validateContent = (value) => {
 
 export const pageValidationSchema = Yup.object().shape({
     // pageType: Yup.string().required().trim().label('Page type'),
-    title: Yup.string().min(3).max(100).required().trim().label('Title'),
+    title: Yup.string().min(3).required().trim().label('Title'),
     status: Yup.string().required().trim().label('Status'),
     slug: Yup.string().required().trim().label('Slug'),
     seoTags: Yup.object().shape({
-        title: Yup.string().max(50).optional().trim().label('Seo title'),
-        tags: Yup.string().max(300).optional().trim().label('Seo tags'),
-        description: Yup.string().max(500).optional().trim().label('Seo description')
+        title: Yup.string().optional().trim().label('Seo title'),
+        tags: Yup.string().optional().trim().label('Seo tags'),
+        description: Yup.string().optional().trim().label('Seo description')
     }),
     content: Yup.string()
         .test('content', 'Content description cannot be empty', (value) => validateContent(value)) // Custom content validation
