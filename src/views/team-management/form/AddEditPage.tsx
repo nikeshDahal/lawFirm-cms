@@ -3,8 +3,10 @@ import { Formik, FormikProps } from 'formik';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton } from '@mui/material';
+import { Grid, TextField, FormHelperText, Stack, Button, MenuItem, Paper, IconButton, Box } from '@mui/material';
 import InputLabel from 'ui-component/extended/Form/InputLabel';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 import { PageStatus } from '../constants/variables';
 import { useGQL } from '../hooks/useGQL';
@@ -23,6 +25,7 @@ const AddEditTeamPage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState({
         name: '',
+        slug: '',
         designation: '',
         practiceArea: '',
         profileImage: '' as string | File | null,
@@ -30,7 +33,18 @@ const AddEditTeamPage = () => {
         facebook: '',
         email: '',
         linkedIn: '',
-        twitter: ''
+        twitter: '',
+        contactNumber: '',
+        about: '',
+        experiences: '',
+        languages: '',
+        qualifications: '',
+        others: '',
+        seoTags: {
+            title: '',
+            description: '',
+            tags: ''
+        }
     });
 
     const { handleOpenSnackbar } = useSnackbar();
@@ -52,11 +66,23 @@ const AddEditTeamPage = () => {
 
             setInitialValues({
                 ...page,
+                slug: page.slug ?? '',
                 status: page.status?.toUpperCase() ?? 'INACTIVE',
                 facebook: page.socialLinks?.facebook ?? '',
                 linkedIn: page.socialLinks?.linkedin ?? '',
                 twitter: page.socialLinks?.twitter ?? '',
-                email: page.socialLinks?.email ?? ''
+                email: page.socialLinks?.email ?? '',
+                contactNumber: page.socialLinks?.contactNumber ?? '',
+                about: page.about ?? '',
+                experiences: page.experiences ?? '',
+                languages: page.languages ?? '',
+                qualifications: page.qualifications ?? '',
+                others: page.others ?? '',
+                seoTags: {
+                    title: page.seoTags?.title ?? '',
+                    description: page.seoTags?.description ?? '',
+                    tags: page.seoTags?.tags ?? ''
+                }
             });
         }
     }, [teamData]);
@@ -158,84 +184,6 @@ const AddEditTeamPage = () => {
                                     </Grid>
                                     <Grid container item spacing={2}>
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Name *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="name"
-                                                placeholder="Enter name"
-                                                value={values.name}
-                                                name="name"
-                                                onBlur={handleBlur}
-                                                onChange={(event) => {
-                                                    handleChange(event);
-                                                }}
-                                            />
-                                            {touched.name && errors.name && (
-                                                <FormHelperText error id="name-error">
-                                                    {errors.name}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Designation *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="designation"
-                                                placeholder="Enter designation"
-                                                value={values.designation}
-                                                name="designation"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.designation && errors.designation && (
-                                                <FormHelperText error id="designation-error">
-                                                    {errors.designation}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Practice Area *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="practiceArea"
-                                                placeholder="Enter practice area"
-                                                value={values.practiceArea}
-                                                name="practiceArea"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched.practiceArea && errors.practiceArea && (
-                                                <FormHelperText error id="practiceArea-error">
-                                                    {errors.practiceArea}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Status *</InputLabel>
-                                            <TextField
-                                                id="team-status"
-                                                name="status"
-                                                select
-                                                value={values.status}
-                                                fullWidth
-                                                onChange={handleChange}
-                                            >
-                                                {PageStatus.map((option) => (
-                                                    <MenuItem key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
-                                            {touched.status && errors.status && (
-                                                <FormHelperText error id="status-error">
-                                                    {errors.status}
-                                                </FormHelperText>
-                                            )}
-                                        </Grid>
-
-                                        <Grid item xs={12} md={6}>
                                             <InputLabel>Profile Image *</InputLabel>
 
                                             {/* Image Upload Container */}
@@ -329,84 +277,435 @@ const AddEditTeamPage = () => {
                                                 </FormHelperText>
                                             )}
                                         </Grid>
-                                    </Grid>
-
-                                    {/* =================== Social Links Section =================== */}
-                                    <Grid container item spacing={2}>
-                                        <Grid item xs={12} mt={1}>
-                                            <strong>Social Links</strong>
-                                        </Grid>
 
                                         <Grid item xs={12} md={6}>
-                                            <InputLabel>Facebook URL</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="facebook"
-                                                placeholder="https://facebook.com/username"
-                                                value={values.facebook}
-                                                name="facebook"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched?.facebook && errors?.facebook && (
-                                                <FormHelperText error id="facebook-error">
-                                                    {errors.facebook}
-                                                </FormHelperText>
-                                            )}
+                                            <Stack spacing={2}>
+                                                <div>
+                                                    <InputLabel>Name *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="name"
+                                                        placeholder="Enter name"
+                                                        value={values.name}
+                                                        name="name"
+                                                        onBlur={handleBlur}
+                                                        onChange={(event) => {
+                                                            handleChange(event);
+                                                            // Auto-generate slug from name
+                                                            const nameValue = event.target.value;
+                                                            const slug = nameValue
+                                                                .toLowerCase()
+                                                                .trim()
+                                                                .replace(/[^\w\s-]/g, '')
+                                                                .replace(/\s+/g, '-')
+                                                                .replace(/-+/g, '-');
+                                                            setFieldValue('slug', slug);
+                                                        }}
+                                                    />
+                                                    {touched.name && errors.name && (
+                                                        <FormHelperText error id="name-error">
+                                                            {errors.name}
+                                                        </FormHelperText>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <InputLabel>Slug</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="slug"
+                                                        placeholder="auto-generated-from-name"
+                                                        value={values.slug}
+                                                        name="slug"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.slug && errors.slug && (
+                                                        <FormHelperText error id="slug-error">
+                                                            {errors.slug}
+                                                        </FormHelperText>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <InputLabel>Designation *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="designation"
+                                                        placeholder="Enter designation"
+                                                        value={values.designation}
+                                                        name="designation"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.designation && errors.designation && (
+                                                        <FormHelperText error id="designation-error">
+                                                            {errors.designation}
+                                                        </FormHelperText>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <InputLabel>Practice Area *</InputLabel>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="practiceArea"
+                                                        placeholder="Enter practice area"
+                                                        value={values.practiceArea}
+                                                        name="practiceArea"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {touched.practiceArea && errors.practiceArea && (
+                                                        <FormHelperText error id="practiceArea-error">
+                                                            {errors.practiceArea}
+                                                        </FormHelperText>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <InputLabel>Status *</InputLabel>
+                                                    <TextField
+                                                        id="team-status"
+                                                        name="status"
+                                                        select
+                                                        value={values.status}
+                                                        fullWidth
+                                                        onChange={handleChange}
+                                                    >
+                                                        {PageStatus.map((option) => (
+                                                            <MenuItem key={option.value} value={option.value}>
+                                                                {option.label}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </TextField>
+                                                    {touched.status && errors.status && (
+                                                        <FormHelperText error id="status-error">
+                                                            {errors.status}
+                                                        </FormHelperText>
+                                                    )}
+                                                </div>
+                                            </Stack>
                                         </Grid>
 
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Email *</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="email"
-                                                placeholder="email@example.com"
-                                                value={values.email}
-                                                name="email"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched?.email && errors?.email && (
-                                                <FormHelperText error id="email-error">
-                                                    {errors.email}
-                                                </FormHelperText>
-                                            )}
+                                        {/* =================== Professional Information Section =================== */}
+                                        <Grid container item spacing={2}>
+                                            <Grid item xs={12} mt={1}>
+                                                <strong>Professional Information</strong>
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <InputLabel>About</InputLabel>
+                                                <Box
+                                                    sx={{
+                                                        border: '1px solid #ddd',
+                                                        borderRadius: '4px',
+                                                        '& .ql-container': {
+                                                            minHeight: '200px',
+                                                            fontSize: '14px'
+                                                        },
+                                                        '& .ql-editor': {
+                                                            minHeight: '200px'
+                                                        }
+                                                    }}
+                                                >
+                                                    <ReactQuill
+                                                        theme="snow"
+                                                        value={values.about}
+                                                        onChange={(content) => setFieldValue('about', content)}
+                                                        onBlur={() => setFieldTouched('about', true)}
+                                                    />
+                                                </Box>
+                                                {touched.about && errors.about && (
+                                                    <FormHelperText error id="about-error">
+                                                        {errors.about}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <InputLabel>Experiences</InputLabel>
+                                                <Box
+                                                    sx={{
+                                                        border: '1px solid #ddd',
+                                                        borderRadius: '4px',
+                                                        '& .ql-container': {
+                                                            minHeight: '200px',
+                                                            fontSize: '14px'
+                                                        },
+                                                        '& .ql-editor': {
+                                                            minHeight: '200px'
+                                                        }
+                                                    }}
+                                                >
+                                                    <ReactQuill
+                                                        theme="snow"
+                                                        value={values.experiences}
+                                                        onChange={(content) => setFieldValue('experiences', content)}
+                                                        onBlur={() => setFieldTouched('experiences', true)}
+                                                    />
+                                                </Box>
+                                                {touched.experiences && errors.experiences && (
+                                                    <FormHelperText error id="experiences-error">
+                                                        {errors.experiences}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Languages</InputLabel>
+                                                <Box
+                                                    sx={{
+                                                        border: '1px solid #ddd',
+                                                        borderRadius: '4px',
+                                                        '& .ql-container': {
+                                                            minHeight: '150px',
+                                                            fontSize: '14px'
+                                                        },
+                                                        '& .ql-editor': {
+                                                            minHeight: '150px'
+                                                        }
+                                                    }}
+                                                >
+                                                    <ReactQuill
+                                                        theme="snow"
+                                                        value={values.languages}
+                                                        onChange={(content) => setFieldValue('languages', content)}
+                                                        onBlur={() => setFieldTouched('languages', true)}
+                                                    />
+                                                </Box>
+                                                {touched.languages && errors.languages && (
+                                                    <FormHelperText error id="languages-error">
+                                                        {errors.languages}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Qualifications</InputLabel>
+                                                <Box
+                                                    sx={{
+                                                        border: '1px solid #ddd',
+                                                        borderRadius: '4px',
+                                                        '& .ql-container': {
+                                                            minHeight: '150px',
+                                                            fontSize: '14px'
+                                                        },
+                                                        '& .ql-editor': {
+                                                            minHeight: '150px'
+                                                        }
+                                                    }}
+                                                >
+                                                    <ReactQuill
+                                                        theme="snow"
+                                                        value={values.qualifications}
+                                                        onChange={(content) => setFieldValue('qualifications', content)}
+                                                        onBlur={() => setFieldTouched('qualifications', true)}
+                                                    />
+                                                </Box>
+                                                {touched.qualifications && errors.qualifications && (
+                                                    <FormHelperText error id="qualifications-error">
+                                                        {errors.qualifications}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <InputLabel>Others</InputLabel>
+                                                <Box
+                                                    sx={{
+                                                        border: '1px solid #ddd',
+                                                        borderRadius: '4px',
+                                                        '& .ql-container': {
+                                                            minHeight: '200px',
+                                                            fontSize: '14px'
+                                                        },
+                                                        '& .ql-editor': {
+                                                            minHeight: '200px'
+                                                        }
+                                                    }}
+                                                >
+                                                    <ReactQuill
+                                                        theme="snow"
+                                                        value={values.others}
+                                                        onChange={(content) => setFieldValue('others', content)}
+                                                        onBlur={() => setFieldTouched('others', true)}
+                                                    />
+                                                </Box>
+                                                {touched.others && errors.others && (
+                                                    <FormHelperText error id="others-error">
+                                                        {errors.others}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
                                         </Grid>
 
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>LinkedIn URL</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="linkedIn"
-                                                placeholder="https://linkedin.com/in/username"
-                                                value={values.linkedIn}
-                                                name="linkedIn"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched?.linkedIn && errors?.linkedIn && (
-                                                <FormHelperText error id="linkedIn-error">
-                                                    {errors.linkedIn}
-                                                </FormHelperText>
-                                            )}
+                                        {/* =================== Social Links Section =================== */}
+                                        <Grid container item spacing={2}>
+                                            <Grid item xs={12} mt={1}>
+                                                <strong>Social Links</strong>
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Facebook URL</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="facebook"
+                                                    placeholder="https://facebook.com/username"
+                                                    value={values.facebook}
+                                                    name="facebook"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched?.facebook && errors?.facebook && (
+                                                    <FormHelperText error id="facebook-error">
+                                                        {errors.facebook}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Email *</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="email"
+                                                    placeholder="email@example.com"
+                                                    value={values.email}
+                                                    name="email"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched?.email && errors?.email && (
+                                                    <FormHelperText error id="email-error">
+                                                        {errors.email}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>LinkedIn URL</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="linkedIn"
+                                                    placeholder="https://linkedin.com/in/username"
+                                                    value={values.linkedIn}
+                                                    name="linkedIn"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched?.linkedIn && errors?.linkedIn && (
+                                                    <FormHelperText error id="linkedIn-error">
+                                                        {errors.linkedIn}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Twitter URL</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="twitter"
+                                                    placeholder="https://twitter.com/username"
+                                                    value={values.twitter}
+                                                    name="twitter"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched?.twitter && errors?.twitter && (
+                                                    <FormHelperText error id="twitter-error">
+                                                        {errors.twitter}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12} md={6}>
+                                                <InputLabel>Contact Number</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="contactNumber"
+                                                    placeholder="+977 9800000000"
+                                                    value={values.contactNumber}
+                                                    name="contactNumber"
+                                                    onBlur={handleBlur}
+                                                    onChange={handleChange}
+                                                />
+                                                {touched?.contactNumber && errors?.contactNumber && (
+                                                    <FormHelperText error id="contactNumber-error">
+                                                        {errors.contactNumber}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
                                         </Grid>
 
-                                        <Grid item xs={12} md={6}>
-                                            <InputLabel>Twitter URL</InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                id="twitter"
-                                                placeholder="https://twitter.com/username"
-                                                value={values.twitter}
-                                                name="twitter"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                            />
-                                            {touched?.twitter && errors?.twitter && (
-                                                <FormHelperText error id="twitter-error">
-                                                    {errors.twitter}
-                                                </FormHelperText>
-                                            )}
+                                        {/* =================== SEO Details Section =================== */}
+                                        <Grid container item spacing={2}>
+                                            <Grid item xs={12} mt={1}>
+                                                <strong>SEO Details</strong>
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <InputLabel>Title</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="seoTags.title"
+                                                    placeholder="Enter SEO title"
+                                                    value={values.seoTags?.title || ''}
+                                                    name="seoTags.title"
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        setFieldValue('seoTags.title', e.target.value);
+                                                    }}
+                                                />
+                                                {touched?.seoTags?.title && errors?.seoTags?.title && (
+                                                    <FormHelperText error id="seoTags.title-error">
+                                                        {errors?.seoTags?.title}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <InputLabel>Description</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="seoTags.description"
+                                                    placeholder="Enter SEO description"
+                                                    value={values.seoTags?.description || ''}
+                                                    name="seoTags.description"
+                                                    multiline
+                                                    rows={3}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        setFieldValue('seoTags.description', e.target.value);
+                                                    }}
+                                                />
+                                                {touched?.seoTags?.description && errors?.seoTags?.description && (
+                                                    <FormHelperText error id="seoTags.description-error">
+                                                        {errors?.seoTags?.description}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <InputLabel>Tags</InputLabel>
+                                                <TextField
+                                                    fullWidth
+                                                    id="seoTags.tags"
+                                                    placeholder="Enter tags separated by commas"
+                                                    value={values.seoTags?.tags || ''}
+                                                    name="seoTags.tags"
+                                                    multiline
+                                                    rows={2}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        setFieldValue('seoTags.tags', e.target.value);
+                                                    }}
+                                                />
+                                                {touched?.seoTags?.tags && errors?.seoTags?.tags && (
+                                                    <FormHelperText error id="seoTags.tags-error">
+                                                        {errors?.seoTags?.tags}
+                                                    </FormHelperText>
+                                                )}
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                 </Grid>

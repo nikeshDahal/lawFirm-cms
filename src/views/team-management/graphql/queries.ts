@@ -29,15 +29,27 @@ export const GET_ALL_TEAMS = gql`
                 createdAt
                 updatedAt
                 name
+                slug
                 designation
                 status
                 practiceArea
                 profileImage
+                about
+                experiences
+                qualifications
+                languages
+                others
+                seoTags {
+                    title
+                    description
+                    tags
+                }
                 socialLinks {
                     facebook
                     email
                     linkedIn
                     twitter
+                    contactNumber
                 }
             }
         }
@@ -53,15 +65,27 @@ export const GET_TEAM_DETAIL = gql`
                 createdAt
                 updatedAt
                 name
+                slug
                 designation
                 status
                 practiceArea
                 profileImage
+                experiences
+                qualifications
+                languages
+                others
+                about
+                seoTags {
+                    title
+                    description
+                    tags
+                }
                 socialLinks {
                     facebook
                     email
                     linkedIn
                     twitter
+                    contactNumber
                 }
             }
         }
