@@ -33,10 +33,11 @@ export const GET_ALL_PAGES = gql`
                 content
                 status
                 seoTags {
-                    title
-                    description
-                    tags
-                }
+      title
+      description
+      tags
+      schemaMarkup
+    }
                 pageType
                 author
                 contactInfo {
@@ -96,10 +97,11 @@ export const GET_PAGE_DETAIL = gql`
             content
             status
             seoTags {
-                title
-                description
-                tags
-            }
+      title
+      description
+      tags
+      schemaMarkup
+    }
             pageType
             author
             contactInfo {

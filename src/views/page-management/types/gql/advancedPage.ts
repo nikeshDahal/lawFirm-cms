@@ -12,6 +12,7 @@ type Banner = {
     image: string;
     alt: string;
     description: string;
+    schemaMarkup?: string;
     label: string;
     url: string;
 };
@@ -57,6 +58,7 @@ type StepsMetaSchema = {
     image: string;
     title: string;
     description: string;
+    schemaMarkup?: string;
 };
 
 type Steps = {
@@ -74,6 +76,7 @@ type SEO = {
     title: string;
     tags: string;
     description: string;
+    schemaMarkup?: string;
 };
 
 type FAQContentSchema = {

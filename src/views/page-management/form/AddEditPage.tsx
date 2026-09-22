@@ -36,7 +36,8 @@ const AddEditPage = () => {
         seoTags: {
             title: '',
             tags: '',
-            description: ''
+            description: '',
+            schemaMarkup: ''
         },
         recognitions: [
             { title: '', subtitle: '', description: '', icon: '' },
@@ -1009,6 +1010,21 @@ const AddEditPage = () => {
                                                 <strong>Page Content</strong>
                                                 <Divider sx={{ mb: 2, mt: 1 }} />
                                             </Grid>
+
+                                        <Grid item xs={12}>
+                                            <InputLabel>Schema Markup (JSON-LD)</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="seo-schemaMarkup"
+                                                placeholder="Enter Schema Markup JSON-LD here"
+                                                value={values.seoTags?.schemaMarkup}
+                                                name="seoTags.schemaMarkup"
+                                                multiline
+                                                rows={6}
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                        </Grid>
                                             <Grid item xs={12}>
                                                 <InputLabel>Content *</InputLabel>
                                                 <QuillEditor value={values.content} setFieldValue={setFieldValue} fieldName="content" />

@@ -33,10 +33,11 @@ export const GET_ALL_PAGES = gql`
                 content
                 status
                 seoTags {
-                    title
-                    description
-                    tags
-                }
+      title
+      description
+      tags
+      schemaMarkup
+    }
                 pageType
                 author
                 pageImage
@@ -63,10 +64,11 @@ export const GET_PAGE_DETAIL = gql`
                 pageImage
                 metaData
                 seoTags {
-                    title
-                    description
-                    tags
-                }
+      title
+      description
+      tags
+      schemaMarkup
+    }
             }
         }
     }
