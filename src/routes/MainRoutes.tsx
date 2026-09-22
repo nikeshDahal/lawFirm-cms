@@ -12,9 +12,9 @@ const lazyReactNaiveRetry: typeof React.lazy = (importer) => {
         try {
             return await importer();
         } catch (error) {
-            // retry 5 times with 1 second delay
+            // retry 5 times with 100ms delay
             for (let i = 0; i < 5; i++) {
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 100));
                 try {
                     return await importer();
                 } catch (e) {
