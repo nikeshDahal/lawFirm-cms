@@ -16,6 +16,7 @@ export const testimonialValidationSchema = Yup.object().shape({
     clientDesignation: Yup.string().min(3).max(100).required().trim().label('Client designation'),
     status: Yup.string().required().trim().label('Status'),
     clientImage: Yup.string().required().trim().label('Client image'),
+    imageAltText: Yup.string().required('Image Alt Text is required').trim().label('Image Alt Text'),
     message: Yup.string()
         .test('content', 'Message cannot be empty', (value) => validateContent(value)) // Custom content validation
         .required()

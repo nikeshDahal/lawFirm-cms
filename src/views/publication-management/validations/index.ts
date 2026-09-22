@@ -21,6 +21,7 @@ export const pageValidationSchema = Yup.object().shape({
         description: Yup.string().optional().trim().label('Seo description')
     }),
     pageImage: Yup.string().required().trim().label('Page image'),
+    imageAltText: Yup.string().required('Image Alt Text is required').trim().label('Image Alt Text'),
     content: Yup.string()
         .test('content', 'Content description cannot be empty', (value) => validateContent(value)) // Custom content validation
         .required()

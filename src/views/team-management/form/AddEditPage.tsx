@@ -29,6 +29,7 @@ const AddEditTeamPage = () => {
         designation: '',
         practiceArea: '',
         profileImage: '' as string | File | null,
+        imageAltText: '',
         status: '',
         facebook: '',
         email: '',
@@ -274,6 +275,23 @@ const AddEditTeamPage = () => {
                                             {touched.profileImage && errors.profileImage && (
                                                 <FormHelperText error id="profileImage-error">
                                                     {errors.profileImage}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} md={12} mt={2}>
+                                            <InputLabel>Image Alt Text *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="imageAltText"
+                                                placeholder="Enter a descriptive text for the image (for SEO)"
+                                                value={values.imageAltText}
+                                                name="imageAltText"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched.imageAltText && errors.imageAltText && (
+                                                <FormHelperText error id="imageAltText-error">
+                                                    {errors.imageAltText as string}
                                                 </FormHelperText>
                                             )}
                                         </Grid>

@@ -11,7 +11,9 @@ export const GET_USER_PROFILE = gql`
             status
             role
             profileImage
-            profileImageUrl
+            imageAltText
+            profileImage
+            imageAltTextUrl
         }
     }
 `;
@@ -34,6 +36,7 @@ export const GET_ALL_TEAMS = gql`
                 status
                 practiceArea
                 profileImage
+            imageAltText
                 about
                 experiences
                 qualifications
@@ -71,6 +74,7 @@ export const GET_TEAM_DETAIL = gql`
                 status
                 practiceArea
                 profileImage
+            imageAltText
                 experiences
                 qualifications
                 languages

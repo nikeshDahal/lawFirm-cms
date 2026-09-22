@@ -31,6 +31,7 @@ const AddEditTestimonialPage = () => {
         clientName: '',
         clientDesignation: '',
         clientImage: '' as string | File,
+        imageAltText: '',
         status: ''
     });
 
@@ -320,6 +321,23 @@ const AddEditTestimonialPage = () => {
                                             {touched.clientImage && errors.clientImage && (
                                                 <FormHelperText error id="clientImage-error">
                                                     {errors.clientImage}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} md={12} mt={2}>
+                                            <InputLabel>Image Alt Text *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="imageAltText"
+                                                placeholder="Enter a descriptive text for the image (for SEO)"
+                                                value={values.imageAltText}
+                                                name="imageAltText"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched.imageAltText && errors.imageAltText && (
+                                                <FormHelperText error id="imageAltText-error">
+                                                    {errors.imageAltText as string}
                                                 </FormHelperText>
                                             )}
                                         </Grid>

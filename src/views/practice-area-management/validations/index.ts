@@ -15,6 +15,8 @@ export const pageValidationSchema = Yup.object().shape({
     title: Yup.string().min(3).required().trim().label('Title'),
     status: Yup.string().required().trim().label('Status'),
     slug: Yup.string().required().trim().label('Slug'),
+    pageImage: Yup.string().required().trim().label('Page image'),
+    imageAltText: Yup.string().required('Image Alt Text is required').trim().label('Image Alt Text'),
     seoTags: Yup.object().shape({
         title: Yup.string().optional().trim().label('Seo title'),
         tags: Yup.string().optional().trim().label('Seo tags'),

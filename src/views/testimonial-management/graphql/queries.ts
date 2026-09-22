@@ -33,6 +33,7 @@ export const GET_ALL_PAGES = gql`
                 clientName
                 clientDesignation
                 clientImage
+            imageAltText
                 status
             }
         }
@@ -52,6 +53,7 @@ export const GET_PAGE_DETAIL = gql`
                 clientName
                 clientDesignation
                 clientImage
+            imageAltText
                 status
             }
         }

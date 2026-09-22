@@ -41,6 +41,7 @@ export const GET_ALL_PAGES = gql`
                 pageType
                 author
                 pageImage
+            imageAltText
                 metaData
             }
         }
@@ -62,6 +63,7 @@ export const GET_PAGE_DETAIL = gql`
                 pageType
                 author
                 pageImage
+            imageAltText
                 metaData
                 seoTags {
       title
