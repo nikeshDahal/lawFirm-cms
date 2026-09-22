@@ -30,6 +30,7 @@ const AddEditPublicationPage = () => {
         pageType: '',
         title: '',
         slug: '',
+        imageAltText: '',
         status: '',
         content: '',
         metaData: '',
@@ -348,6 +349,23 @@ const AddEditPublicationPage = () => {
                                             {touched.pageImage && errors.pageImage && (
                                                 <FormHelperText error id="pageImage-error">
                                                     {errors.pageImage}
+                                                </FormHelperText>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} md={12} mt={2}>
+                                            <InputLabel>Image Alt Text *</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="imageAltText"
+                                                placeholder="Enter a descriptive text for the image (for SEO)"
+                                                value={values.imageAltText}
+                                                name="imageAltText"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
+                                            {touched.imageAltText && errors.imageAltText && (
+                                                <FormHelperText error id="imageAltText-error">
+                                                    {errors.imageAltText as string}
                                                 </FormHelperText>
                                             )}
                                         </Grid>
