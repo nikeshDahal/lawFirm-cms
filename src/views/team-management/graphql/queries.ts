@@ -40,10 +40,11 @@ export const GET_ALL_TEAMS = gql`
                 languages
                 others
                 seoTags {
-                    title
-                    description
-                    tags
-                }
+      title
+      description
+      tags
+      schemaMarkup
+    }
                 socialLinks {
                     facebook
                     email
@@ -76,10 +77,11 @@ export const GET_TEAM_DETAIL = gql`
                 others
                 about
                 seoTags {
-                    title
-                    description
-                    tags
-                }
+      title
+      description
+      tags
+      schemaMarkup
+    }
                 socialLinks {
                     facebook
                     email

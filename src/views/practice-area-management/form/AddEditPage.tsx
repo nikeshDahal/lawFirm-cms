@@ -35,7 +35,8 @@ const AddEditPagePracticeArea = () => {
         seoTags: {
             title: '',
             tags: '',
-            description: ''
+            description: '',
+            schemaMarkup: ''
         }
     });
 
@@ -406,6 +407,21 @@ const AddEditPagePracticeArea = () => {
                                         <Grid item xs={12} mt={1}>
                                             <strong>Page content</strong>
                                             <Divider sx={{ mb: 2, mt: 1 }} />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <InputLabel>Schema Markup (JSON-LD)</InputLabel>
+                                            <TextField
+                                                fullWidth
+                                                id="seo-schemaMarkup"
+                                                placeholder="Enter Schema Markup JSON-LD here"
+                                                value={values.seoTags?.schemaMarkup}
+                                                name="seoTags.schemaMarkup"
+                                                multiline
+                                                rows={6}
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                            />
                                         </Grid>
 
                                         <Grid item xs={12}>
